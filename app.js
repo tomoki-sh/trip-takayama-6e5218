@@ -1577,29 +1577,32 @@ const SPOT_SORTS = [
 // タブを増やすならここに1行足すだけ。filters は FILTER_GROUPS のキーの配列
 const CARD_TABS = {
   spots: {
-    target: "#cards-spots", tools: "#tools-spots", type: "spot",
+    target: "#cards-spots", tools: "#tools-spots", table: "#table-spots", type: "spot",
     filters: ["spot", "dog"], sorts: SPOT_SORTS, unit: "か所",
     empty: "条件に合う場所がありません。「すべて表示」で戻せます。",
     items: () => DATA.spots,
   },
   restaurants: {
-    target: "#cards-restaurants", tools: "#tools-restaurants", type: "restaurant",
+    target: "#cards-restaurants", tools: "#tools-restaurants", table: "#table-restaurants", type: "restaurant",
     filters: ["genre", "dog"], sorts: CARD_SORTS, unit: "店",
     empty: "条件に合う店がありません。「すべて表示」で戻せます。",
     items: () => DATA.restaurants,
   },
   cafes: {
-    target: "#cards-cafes", tools: "#tools-cafes", type: "cafe",
+    target: "#cards-cafes", tools: "#tools-cafes", table: "#table-cafes", type: "cafe",
     filters: ["genre", "dog"], sorts: CARD_SORTS, unit: "店",
     empty: "条件に合う店がありません。「すべて表示」で戻せます。",
     items: () => DATA.cafes,
   },
 };
 // sets[列ID] が未設定 = 未初期化（初回に全選択にする）
+// open: 一覧表の開閉。★localStorage にも Firebase にも保存しない（見る人ごとの表示状態。追補H-9）
+//       ただし renderCardTab() は絞り込み・確定トグル・Firebase受信のたびに走るので、
+//       ここに控えておかないとチップを押すたびに表が勝手に閉じる。
 const cardView = {
-  spots:       { sets: {}, sort: "default" },
-  restaurants: { sets: {}, sort: "default" },
-  cafes:       { sets: {}, sort: "default" },
+  spots:       { sets: {}, sort: "default", open: false },
+  restaurants: { sets: {}, sort: "default", open: false },
+  cafes:       { sets: {}, sort: "default", open: false },
 };
 
 const numOr = (v) => { const n = parseFloat(v); return isNaN(n) ? null : n; };
@@ -1703,8 +1706,69 @@ function renderCardTools(key) {
   });
 }
 
+/* ===== 一覧表（各タブのカードの上に置く折りたたみ式の索引） =====
+   ★行は viewedItems() をそのまま描く。絞り込み条件を二重に実装しないので、
+     地点を足せば行も増え、チップを押せば表も追随する。 */
+// 表の点数欄。狭いので口コミ件数は出さない。数値は p.ratings から引く（書き写さない）
+function tableScore(p) {
+  const r = p.ratings || {}, out = [];
+  if (r.tabelog) out.push(`<span class="ct-tabelog">🍴${esc(r.tabelog)}</span>`);
+  if (r.google)  out.push(`<span class="ct-google">⭐${esc(r.google)}</span>`);
+  return out.length ? out.join(" ") : `<span class="muted">—</span>`;
+}
+/* 行 → その地点のカードへ移動。
+   地点idは "spot:飛騨の里" のように : と日本語を含むので、CSSセレクタではなく
+   data 属性の突き合わせで引く（エスケープ事故を避ける）。 */
+function gotoPlaceCard(key, id) {
+  const card = $$(CARD_TABS[key].target + " .card").find(c => c.dataset.place === id);
+  if (!card) return;   // 表とカードは同じ viewedItems から作るので通常ここには来ない
+  card.scrollIntoView({ behavior: "smooth", block: "start" });
+  // 連続でタップしてもハイライトが再生されるよう、一度外してリフローを挟む
+  card.classList.remove("just-jumped");
+  void card.offsetWidth;
+  card.classList.add("just-jumped");
+}
+function renderCardTable(key) {
+  const t = CARD_TABS[key];
+  const box = $(t.table); if (!box) return;
+  const list = viewedItems(key), v = cardView[key];
+  // ★viewedItems() が返すのは DATA の生オブジェクトで type を持たない
+  //   （type は renderCards() が {...p, type} で足している）。
+  //   ここで p.type を使うと data-goto が "undefined:飛騨の里" になり、
+  //   飛び先が静かに切れる。タブ定義の t.type を使うこと。
+  const rows = list.map(p => {
+    const id = placeId(t.type, p.name);
+    return `<tr class="ct-row" data-goto="${esc(id)}" tabindex="0" role="button" title="${esc(p.name)}の詳細へ移動">
+      <td class="ct-name">${TYPE_ICONS[t.type]} ${esc(p.name)}</td>
+      <td class="ct-dog">${dogChip(p)}</td>
+      <td class="ct-score">${tableScore(p)}</td>
+    </tr>`;
+  }).join("");
+  box.innerHTML = `<details class="ct-details"${v.open ? " open" : ""}>
+    <summary class="ct-summary">一覧で見る<span class="ct-n">${list.length}${esc(t.unit)}</span></summary>
+    <div class="ct-wrap">
+      <table class="ct">
+        <thead><tr><th>名前</th><th>犬</th><th>点数</th></tr></thead>
+        <tbody>${rows || `<tr><td colspan="3" class="muted">${esc(t.empty)}</td></tr>`}</tbody>
+      </table>
+    </div>
+  </details>`;
+
+  // 開閉を控える（再描画で閉じてしまわないように）
+  $(t.table + " .ct-details").addEventListener("toggle", e => { cardView[key].open = e.currentTarget.open; });
+  // 行をタップ／Enter でカードへ移動
+  $$(t.table + " .ct-row").forEach(tr => {
+    const go = () => gotoPlaceCard(key, tr.dataset.goto);
+    tr.addEventListener("click", go);
+    tr.addEventListener("keydown", e => {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); }
+    });
+  });
+}
+
 function renderCardTab(key) {
   renderCardTools(key);
+  renderCardTable(key);
   const t = CARD_TABS[key], list = viewedItems(key);
   const box = $(t.target); if (!box) return;
   if (list.length) renderCards(t.target, list, t.type);
@@ -1766,7 +1830,7 @@ function linkPills(p) {
 function renderCard(p) {
   const badges = (p.badges || []).map(b => `<span class="badge ${esc(b.cls)}">${esc(b.text)}</span>`).join("");
   const meta = (p.meta || []).map(m => `<li><b>${esc(m[0])}</b><span>${mdBold(m[1])}</span></li>`).join("");
-  return `<article class="card">
+  return `<article class="card" data-place="${esc(placeId(p.type, p.name))}">
     ${renderImageBlock(p)}
     <div class="card-body">
       <h3 class="card-title">${esc(p.name)}</h3>

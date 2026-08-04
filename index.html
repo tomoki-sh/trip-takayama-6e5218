@@ -22,7 +22,7 @@
        「新しい index.html ＋ 古い app.js」の組み合わせが起き、
        タブは増えているのに中身が空、という状態になる。
        ★内容を更新して push するときは、必ずこの数字を +1 すること（3か所とも同じ値）。 -->
-  <link rel="stylesheet" href="style.css?v=c496adfb" />
+  <link rel="stylesheet" href="style.css?v=8e90c709" />
 </head>
 <body>
   <header class="hero">
@@ -172,6 +172,8 @@
       <h2 class="panel-title">スポット</h2>
       <p class="panel-lead">飛騨の里・飛騨大鍾乳洞を軸に、同行者の希望であるJAと山田春慶店、雨と猛暑の逃げ場になる屋内候補、往復のドッグラン付きSAを並べています。<strong>「種類」と「犬」は掛け合わせて絞り込めます</strong>（例：種類＝屋内・展示 × 犬＝屋内も一緒に → 雨の日に犬と入れる場所だけが残ります）。<strong>犬の同伴条件は地点ごとに違う</strong>ので、各カードの「犬」の行も必ず読んでください。</p>
       <div class="card-tools" id="tools-spots"></div>
+      <!-- 折りたたみ式の一覧表。中身は app.js の renderCardTable() が描画 -->
+      <div class="card-table" id="table-spots"></div>
       <div class="cards" id="cards-spots"></div>
     </section>
 
@@ -180,6 +182,8 @@
       <h2 class="panel-title">レストラン</h2>
       <p class="panel-lead">夕食はすべてホテルなので、ここは<strong>昼食の候補</strong>です。<strong>犬と店内に入れる店</strong>（大喜・ぼくんち・茶茶の蔵太）を最優先にし、テラス席だけの店には頼りません。<strong>点数は食べログ・Google（2026年8月4日時点）</strong>。犬不可の店も、判断材料として区別して載せています。</p>
       <div class="card-tools" id="tools-restaurants"></div>
+      <!-- 折りたたみ式の一覧表。中身は app.js の renderCardTable() が描画 -->
+      <div class="card-table" id="table-restaurants"></div>
       <div class="cards" id="cards-restaurants"></div>
     </section>
 
@@ -188,6 +192,8 @@
       <h2 class="panel-title">カフェ・休憩</h2>
       <p class="panel-lead">朝市のすぐそばで<strong>犬と店内に入れる福太郎</strong>が本命。テラス席のみの店は真夏と雨に弱いので予備扱いです。ハードキャリーが要る店、犬不可の店も条件を明記しています。</p>
       <div class="card-tools" id="tools-cafes"></div>
+      <!-- 折りたたみ式の一覧表。中身は app.js の renderCardTable() が描画 -->
+      <div class="card-table" id="table-cafes"></div>
       <div class="cards" id="cards-cafes"></div>
     </section>
 
@@ -250,7 +256,7 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
           integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js" defer></script>
-  <script src="app.js?v=c496adfb" defer></script>
+  <script src="app.js?v=8e90c709" defer></script>
 
   <!-- Firebase リアルタイム同期（スケジュール・確定状態・ルートを全員で共有）
        apiKey 等は秘密情報ではなく識別子。保護は Realtime Database のルール（匿名ログイン限定）で行う。 -->
