@@ -33,6 +33,7 @@
   <nav class="tabs" id="tabs" aria-label="セクション切替">
     <button class="tab active" data-tab="schedule">🗓 スケジュール</button>
     <button class="tab" data-tab="map">🗺 マップ</button>
+    <button class="tab" data-tab="dog">🐾 ワンちゃん特集</button>
     <button class="tab" data-tab="spots">🌿 スポット</button>
     <button class="tab" data-tab="restaurants">🍽 レストラン</button>
     <button class="tab" data-tab="cafes">☕ カフェ</button>
@@ -154,6 +155,13 @@
       </div>
     </section>
 
+    <!-- ワンちゃん特集（読み物。中身は app.js の DATA.dogFeature が描画） -->
+    <section class="panel" id="panel-dog">
+      <h2 class="panel-title">ワンちゃん特集</h2>
+      <p class="panel-lead">この旅行の主役は<strong>愛犬2匹</strong>。39か所の候補から、<strong>犬と一緒に行ける場所だけ</strong>を選んで並べた読み物です。旅行前に一度通して読めば、<strong>どこで食べられて、どこで走らせられて、何を電話で確かめるか</strong>が分かります。出典は同行者からの資料と<strong>飛騨高山旅ガイドのペット同伴スポット</strong>（2026年8月4日時点）。</p>
+      <div id="dog-content"></div>
+    </section>
+
     <!-- スポット -->
     <section class="panel" id="panel-spots">
       <h2 class="panel-title">スポット</h2>
@@ -229,8 +237,8 @@
     <p>飛騨高山 2026.8.8〜8.12 ／ 同行者と共有用（個人情報・予約番号は掲載しません）</p>
     <p class="muted">写真: Googleマップ（Place Photos）より ／ 点数: 食べログ・Googleマップより（各社・投稿者に権利。私的共有の範囲で参照用）／ 地図: © OpenStreetMap contributors ／ 天気: Open-Meteo</p>
     <details class="photo-credits">
-      <summary class="muted">Googleマップ写真の投稿者クレジット（132名）</summary>
-      <p class="muted">写真は Google マップの以下の投稿者・店舗提供によるものです（敬称略・順不同）: 3986 hatch / 7 NAna / AOMAME / Allen & Helen / Andrea Marchetti / Cafe takayama terrace / Cedric Wens / Chih-Hao Hsieh (Hao) / Clément Pollet / Coffee & Kitchen ぼくんちBokunchi / Ethan Wright / FUMIKAZU NAKAYAMA / Felipe / Find out Nippon R / HARU1005 / HanChiY / I A / JN2 SKK / Jacques Apon / K. “KENCHA” N. / KEIKO SUZUKI / Ki Lurah Amongrogo / Kumu23 / Ma / Ma milo / Maharshi Ray / Marc Fernández / Masamune Tosa / Miyabi / Nonono Nono (喜歡吃炒飯) / Patrizia Vitelli / Phachara P. (Porche') / Pinto Lee / Rem Ka / Rex H / Ryan Kuo / Ryuichi Fukuda / S. Morita / SY KAO / Shark-o / Shigeru SATO / Sobthana Anprasert / Suzanne Boelens-van der Lee / T T / Tan Cheng Har / Thomas Deburggraeve / TripBe / Warot an (わろたん) / Wat K / Yi Small / ahobakaking / c s / em meht / hiro / ho wang chan / k c / kenji kt / sammy 100 / susumunda / wenfu lin / woodfellas / wrai ther (wraither) / yamaguch Hironobu / yossui j / yusuke kaba / zamong lee / あ / あやのすけ / いちい（櫟）Ichii / いとちゅう / いゆき / おおすかまひと / お食事処 大喜 / かばとっと / くりくり / しの（しのさん） / すぅさん / せいわはたせ / せんがゆうすけ / たくあん / ひらりんのりこ / ぷれぷれぷれあです / ぺこ / みだらしだんご三川屋 / みなちゅ / ゆけ / わんわんパラダイス 高山（旧：高山わんわんパラダイスホテル＆コテージ） / アメーバ轟 / サンクチュアリコート高山 アートギャラリーリゾート / サンマRX-78 / ジージー / ナズムル ハサンミルザ / バルフィオーレ Bar Fiore / マツヒデ / ユウスケハラオカ / ラビットヒルズ / リヴェルタ281 / 中野賢一 / 五島健喜智 / 伊藤誠一 / 剣“michiy777”槍ヶ岳 / 匠館 / 吃一口 / 吉川勉 / 周利槃特釈迦仏 / 喫茶去かつて / 坂孝廣 / 多賀サービスエリア (上り) / 宮地吉弥 / 寂靜盛夏日落 / 山川俊昭（Toshyan） / 平林淳 / 本山義洋 / 松岡幹雄 / 森大輔 / 浅野勝 / 清水大地 / 渡邉光雄 / 琥虎 / 益重勝利 / 虎将 / 通りすがりのヨッサン / 野口正 / 金子顕博 / 陳冠群 / 飛騨大鍾乳洞 / 飛騨高山レトロミュージアム / 飛騨高山茶寮 三葉 / 高義和 / 麒麟 / 黄昏の夢追人 / （有）山田春慶店</p>
+      <summary class="muted">Googleマップ写真の投稿者クレジット（136名）</summary>
+      <p class="muted">写真は Google マップの以下の投稿者・店舗提供によるものです（敬称略・順不同）: 3986 hatch / 7 NAna / AOMAME / Allen & Helen / Andrea Marchetti / Cafe takayama terrace / Cedric Wens / Chih-Hao Hsieh (Hao) / Clément Pollet / Coffee & Kitchen ぼくんちBokunchi / Ethan Wright / FUMIKAZU NAKAYAMA / Felipe / Find out Nippon R / HARU1005 / HanChiY / I A / JN2 SKK / Jacques Apon / K. “KENCHA” N. / KEIKO SUZUKI / Ki Lurah Amongrogo / Kumu23 / Lon Rwin / Ma / Ma milo / Maharshi Ray / Marc Fernández / Masamune Tosa / Miyabi / Nonono Nono (喜歡吃炒飯) / Patrizia Vitelli / Phachara P. (Porche') / Pinto Lee / Rem Ka / Rex H / Ryan Kuo / Ryuichi Fukuda / S. Morita / SY KAO / Shark-o / Shigeru SATO / Sobthana Anprasert / Suzanne Boelens-van der Lee / T T / Tan Cheng Har / Thomas Deburggraeve / TripBe / Tuyết Chinh Hoàng Thị / Warot an (わろたん) / Wat K / Yi Small / ahobakaking / c s / em meht / hiro / ho wang chan / k c / kenji kt / sammy 100 / susumunda / wenfu lin / woodfellas / wrai ther (wraither) / yamaguch Hironobu / yossui j / yusuke kaba / zamong lee / あ / あやのすけ / いちい（櫟）Ichii / いとちゅう / いゆき / おおすかまひと / お食事処 大喜 / かばとっと / くりくり / しの（しのさん） / すぅさん / せいわはたせ / せんがゆうすけ / たくあん / ひらりんのりこ / ぷれぷれぷれあです / ぺこ / みだらしだんご三川屋 / みなちゅ / ゆけ / わんわんパラダイス 高山（旧：高山わんわんパラダイスホテル＆コテージ） / アメーバ轟 / サンクチュアリコート高山 アートギャラリーリゾート / サンマRX-78 / ジージー / ナズムル ハサンミルザ / バルフィオーレ Bar Fiore / マツヒデ / ユウスケハラオカ / ラビットヒルズ / リヴェルタ281 / 中野賢一 / 中野賢一（Kenichi Nakano） / 五島健喜智 / 伊藤誠一 / 剣“michiy777”槍ヶ岳 / 匠館 / 吃一口 / 吉川勉 / 周利槃特釈迦仏 / 喫茶去かつて / 坂孝廣 / 多賀サービスエリア (上り) / 宮地吉弥 / 寂靜盛夏日落 / 山川俊昭（Toshyan） / 平林淳 / 本山義洋 / 松岡幹雄 / 森大輔 / 横田幸平 / 浅野勝 / 清水大地 / 渡邉光雄 / 琥虎 / 益重勝利 / 虎将 / 通りすがりのヨッサン / 野口正 / 金子顕博 / 陳冠群 / 飛騨大鍾乳洞 / 飛騨高山レトロミュージアム / 飛騨高山茶寮 三葉 / 高義和 / 麒麟 / 黄昏の夢追人 / （有）山田春慶店</p>
     </details>
   </footer>
 
