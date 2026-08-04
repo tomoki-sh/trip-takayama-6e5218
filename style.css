@@ -566,6 +566,8 @@ a { color: var(--ai); }
 
 /* ===== 天気 ===== */
 .weather-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: .6rem; }
+/* 出典と降水確率の定義の注記。グリッドの全幅を使う */
+.wx-note { grid-column: 1 / -1; margin: .2rem 0 0; font-size: .78rem; line-height: 1.6; }
 .wx-day { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: .6rem .4rem; text-align: center; box-shadow: var(--shadow); }
 .wx-day.is-trip { border-color: var(--shu); border-width: 2px; }
 .wx-dow { font-size: .8rem; font-weight: 700; color: var(--ai); }
