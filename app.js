@@ -1914,13 +1914,20 @@ function schedRowHtml(it, i) {
   const endUi = (it.end === undefined || it.end === null)
     ? `<button class="sched-addend" data-i="${i}" title="終了時間を追加">＋終了</button>`
     : `<span class="sched-tilde">〜</span><input class="sched-endtime" type="time" value="${esc(it.end)}" data-i="${i}" aria-label="終了時刻"><button class="sched-rmend" data-i="${i}" title="終了時間を消す">×</button>`;
+  // ★時刻と終了UIは .sched-when でひとまとめにする。
+  //   「＋終了」1個の行と「〜 終了時刻 ×」3個の行で幅が変わると、
+  //   そのぶん右の「予定」の左端が行ごとにズレて縦に読みにくくなるため。
   return `
       <li class="sched-item ${st}" data-i="${i}" data-day="${esc(normalizeDay(it.day))}">
         <span class="sched-handle" aria-label="ドラッグして並び替え" title="ドラッグで並び替え">≡</span>
-        <input class="sched-time" type="time" value="${esc(it.time || "")}" data-i="${i}" aria-label="開始時刻">${endUi}
-        <input class="sched-text" type="text" value="${esc(it.text || "")}" data-i="${i}" placeholder="予定を入力" aria-label="予定">${linked}
-        <button class="sched-status st-chip ${st}" data-i="${i}" title="確定／未確定を切替${it.ref ? "（カード・マップと連動）" : ""}">${STATUS_LABEL[st]}</button>
-        <button class="sched-rm" data-i="${i}" aria-label="この行を削除">✕</button>
+        <span class="sched-when">
+          <input class="sched-time" type="time" value="${esc(it.time || "")}" data-i="${i}" aria-label="開始時刻">${endUi}
+        </span>
+        <span class="sched-ctrl">${linked}
+          <button class="sched-status st-chip ${st}" data-i="${i}" title="確定／未確定を切替${it.ref ? "（カード・マップと連動）" : ""}">${STATUS_LABEL[st]}</button>
+          <button class="sched-rm" data-i="${i}" aria-label="この行を削除">✕</button>
+        </span>
+        <input class="sched-text" type="text" value="${esc(it.text || "")}" data-i="${i}" placeholder="予定を入力" aria-label="予定">
       </li>`;
 }
 

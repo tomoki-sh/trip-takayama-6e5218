@@ -185,19 +185,52 @@ a { color: var(--ai); }
 .sched-editor { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); padding: .9rem; margin-bottom: 1.2rem; }
 .sched-legend { display: flex; flex-wrap: wrap; align-items: center; gap: .35rem .5rem; font-size: .8rem; color: #5c554a; margin-bottom: .7rem; }
 .sched-list { list-style: none; margin: 0 0 .7rem; padding: 0; display: flex; flex-direction: column; gap: .45rem; }
+/* ★行の組み立て: 上段＝時刻と操作、下段＝予定（つねに全幅）。
+   予定を時刻の横に並べると、画面幅に関係なく文字が途中で切れて読めない
+   （2カラム表示では予定欄が210px＝13字ほどしか入らなかった）。
+   order で予定を最後に回し、flex-basis:100% で必ず自分の行に落とす。
+   幅が足りなければ操作の一群だけがさらに段落ちするので、
+   メディアクエリなしでどの画面幅でも破綻しない。 */
 .sched-item {
-  display: flex; align-items: center; flex-wrap: wrap; gap: .4rem;
+  display: flex; flex-wrap: wrap; align-items: center; gap: .35rem .4rem;
   background: var(--kinari); border: 1px solid var(--line); border-left: 4px solid #c9bfa9;
   border-radius: 10px; padding: .45rem .55rem;
 }
+/* 📍／確定／✕ は一体で動かす。バラバラだと狭い画面で 📍 だけが取り残される */
+.sched-ctrl { display: flex; align-items: center; gap: .35rem; order: 5; margin-left: auto; }
+.sched-text { order: 10; flex: 1 0 100%; }
 .sched-item.confirmed { border-left-color: var(--shu); }
 .sched-handle { cursor: grab; color: var(--muted); font-size: 1.15rem; padding: 0 .15rem; touch-action: none; user-select: none; }
-.sched-time, .sched-endtime { width: 86px; border: 1px solid var(--line); border-radius: 7px; padding: .3rem .35rem; font: inherit; font-size: .85rem; background: #fff; color: var(--sumi); }
+
+/* ★時刻ゾーン: 「＋終了」1個の行と「〜 終了時刻 ×」3個の行で
+   グリッドの列数が変わってしまわないよう、まとめて1つの要素にしておく。 */
+.sched-when { display: flex; align-items: center; gap: .3rem; }
+
+/* 時刻と予定＝情報。太く濃くして、周りの操作ボタンより先に目に入るようにする */
+.sched-time, .sched-endtime {
+  width: 84px; border: 1px solid var(--line); border-radius: 7px; padding: .3rem .35rem;
+  font: inherit; font-size: .88rem; font-weight: 700; font-variant-numeric: tabular-nums;
+  background: #fff; color: var(--ai);
+}
 .sched-tilde { color: var(--muted); font-size: .85rem; }
 .sched-addend, .sched-rmend { border: 1px dashed var(--line); background: #fff; color: var(--muted); cursor: pointer; border-radius: 7px; font: inherit; font-size: .74rem; padding: .28rem .45rem; white-space: nowrap; }
 .sched-addend:hover, .sched-rmend:hover { border-color: var(--shu); color: var(--shu); }
 .sched-rmend { border-style: solid; padding: .28rem .5rem; font-weight: 700; }
-.sched-text { flex: 1 1 150px; min-width: 0; border: 1px solid var(--line); border-radius: 7px; padding: .38rem .55rem; font: inherit; font-size: .9rem; background: #fff; color: var(--sumi); }
+.sched-text {
+  min-width: 0; border: 1px solid var(--line); border-radius: 7px;
+  padding: .38rem .55rem; font: inherit; font-size: .95rem; font-weight: 600;
+  background: #fff; color: var(--sumi);
+}
+/* 空行の案内文まで太くしない */
+.sched-text::placeholder { font-weight: 400; color: var(--muted); }
+
+/* 操作＝脇役。薄くしておき、触れたときだけはっきりさせる
+   （:focus-visible も戻さないとキーボード操作で見失う） */
+.sched-handle, .sched-addend, .sched-rmend, .sched-rm { opacity: .6; transition: opacity .12s; }
+.sched-item:hover .sched-handle,
+.sched-handle:hover, .sched-addend:hover, .sched-rmend:hover, .sched-rm:hover,
+.sched-handle:focus-visible, .sched-addend:focus-visible,
+.sched-rmend:focus-visible, .sched-rm:focus-visible { opacity: 1; }
 .sched-status { border: none; cursor: pointer; font-weight: 700; }
 .st-chip { font-size: .72rem; padding: .2rem .55rem; border-radius: 999px; line-height: 1; white-space: nowrap; }
 .st-chip.confirmed { background: var(--shu); color: #fff; }
