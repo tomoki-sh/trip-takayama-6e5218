@@ -2928,8 +2928,13 @@ function applyRemote(d) {
   if (Array.isArray(d.status)) {
     const incoming = {};
     d.status.forEach(x => { if (x && x.id) incoming[x.id] = (x.s === "confirmed" ? "confirmed" : "tentative"); });
-    if (JSON.stringify(incoming) !== JSON.stringify(statusMap)) {
-      statusMap = incoming; localStorage.setItem(STATUS_KEY, JSON.stringify({ v: STATUS_VERSION, map: statusMap })); changed = true;
+    // ★DBのstatusは「書き込まれた時点にあった地点」しか持たない。あとから地点を足すと
+    //   そのidが欠けたまま届くので、丸ごと置き換えると新しい地点が statusMap から消える。
+    //   DATA の category 由来の既定値に上書きする形で合成し、欠けた地点が
+    //   （category が confirmed でも）未確定に落ちるのを防ぐ。
+    const merged = { ...baseStatusMap(), ...incoming };
+    if (JSON.stringify(merged) !== JSON.stringify(statusMap)) {
+      statusMap = merged; localStorage.setItem(STATUS_KEY, JSON.stringify({ v: STATUS_VERSION, map: statusMap })); changed = true;
     }
   }
   if (d.route && JSON.stringify(d.route) !== JSON.stringify(routeIds)) {
