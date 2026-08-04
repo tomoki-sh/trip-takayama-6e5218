@@ -361,45 +361,72 @@ a { color: var(--ai); }
 
 /* ===== マップ ===== */
 #map { height: 60vh; min-height: 360px; border-radius: var(--radius); border: 1px solid var(--line); box-shadow: var(--shadow); margin-bottom: 1rem; }
-.map-filters { display: flex; flex-wrap: wrap; gap: .8rem; margin-bottom: .8rem; }
-.filter-group { display: flex; align-items: center; gap: .35rem; flex-wrap: wrap; }
-.filter-label { font-size: .78rem; font-weight: 700; color: var(--ai); margin-right: .1rem; }
+.filter-label { font-size: .78rem; font-weight: 700; color: var(--ai); }
 .chip {
   display: inline-flex; align-items: center; gap: .25rem; font-size: .8rem;
   background: var(--card); border: 1px solid var(--line); padding: .25rem .6rem;
   border-radius: 999px; cursor: pointer; user-select: none;
 }
 .chip input { accent-color: var(--shu); }
-
-/* ===== カードの絞り込み・並び替えツールバー（スポット／レストラン／カフェ共通） =====
-   列（種類・犬・ジャンル・並び替え）を縦に積む。ラベル幅を揃えるとチップの左端が
-   そろって、列が2本以上あっても読み違えない。 */
-.card-tools {
-  display: flex; flex-wrap: wrap; gap: .5rem .9rem; align-items: flex-start;
-  background: var(--card); border: 1px solid var(--line); border-radius: 12px;
-  padding: .6rem .7rem; margin-bottom: 1rem; box-shadow: var(--shadow);
-}
-.card-tools .filter-group { width: 100%; align-items: baseline; }
-.card-tools .filter-label {
-  flex: none; min-width: 4em; padding-top: .15rem;
-}
 .chip-n {
   margin-left: .3rem; font-size: .72em; font-weight: 700; color: var(--muted);
   background: var(--kinari-2); border-radius: 999px; padding: 0 .35em;
 }
 .chip:has(input:not(:checked)) { opacity: .5; }
+
+/* ===== 絞り込みツールバー（カードのタブ・マップ共通） =====
+   ゾーン（種類／犬／ジャンル／並び替え／日／状態／ルート）を1本ずつ積み、
+   各ゾーンを「ラベル列 | チップ列」の2列グリッドにする。
+   ★チップを .chip-row で包んでグリッドの右カラムに入れるのが要点。
+     flex-wrap のままだと折り返したチップがラベルの真下に回り込み、
+     どこからどこまでが1ゾーンなのか分からなくなる。 */
+.card-tools, .map-filters {
+  background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+  box-shadow: var(--shadow); overflow: hidden;   /* 角丸から罫線がはみ出さない */
+  padding: 0; margin-bottom: 1rem;
+}
+.tools-head {
+  display: flex; align-items: center; gap: .5rem;
+  padding: .45rem .7rem;
+  background: var(--kinari-2); border-bottom: 1px solid var(--line);
+}
+.tools-title { font-size: .78rem; font-weight: 700; color: var(--ai); letter-spacing: .04em; }
+.tools-head .card-tool-count, .tools-head .map-filter-count { margin-left: auto; }
+
+.card-tools .filter-group, .map-filters .filter-group {
+  display: grid; grid-template-columns: 5em minmax(0, 1fr); gap: 0;
+  /* ★下の汎用 .filter-group が align-items:center を持つので明示的に打ち消す。
+     stretch にしないとラベル列の背景と縦罫線が文字の高さぶんしか伸びず、
+     列の区切りが途切れて見える。 */
+  align-items: stretch;
+}
+/* 見出し行の下線があるので、2本目以降のゾーンにだけ区切り線を引く */
+.card-tools .filter-group + .filter-group,
+.map-filters .filter-group + .filter-group { border-top: 1px solid var(--line); }
+
+.card-tools .filter-label, .map-filters .filter-label {
+  display: flex; align-items: center;   /* 箱は全高に伸ばしつつ、文字は縦中央に置く */
+  padding: .5rem .6rem; margin: 0;
+  background: var(--kinari); border-right: 1px solid var(--line);
+}
+.chip-row { display: flex; flex-wrap: wrap; gap: .35rem; padding: .5rem .6rem; }
+
+/* ツールバーの外に .filter-group を置いたとき用のフォールバック（現状は該当なし） */
+.filter-group { display: flex; align-items: center; gap: .35rem; flex-wrap: wrap; }
+
 .card-tool-sort {
   font: inherit; font-size: .8rem; color: var(--sumi);
   border: 1px solid var(--line); border-radius: 999px; padding: .28rem .6rem;
   background: #fff; max-width: 100%;
 }
 .card-tool-sort:focus { outline: 2px solid var(--ai-2); outline-offset: 1px; }
-.card-tool-all { font-size: .76rem; padding: .22rem .6rem; }
-.card-tool-count { white-space: nowrap; }
+.card-tool-all { font-size: .76rem; padding: .22rem .6rem; flex: none; }
+.card-tool-count, .map-filter-count { white-space: nowrap; }
 @media (max-width: 520px) {
-  .card-tools { gap: .5rem; }
-  .card-tools .filter-group { width: 100%; }
-  .card-tool-sort { flex: 1 1 auto; }
+  .card-tools .filter-group, .map-filters .filter-group { grid-template-columns: 4.4em 1fr; }
+  .card-tools .filter-label, .map-filters .filter-label { padding: .45rem .4rem; }
+  .chip-row { padding: .45rem .5rem; }
+  .card-tool-sort { width: 100%; }
 }
 
 /* Leaflet pin */

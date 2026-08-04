@@ -1479,6 +1479,8 @@ function renderCardTools(key) {
   const v = cardView[key];
 
   // 列ごとにチップを作る。data-fgroup でどの列のチップかを持たせる（値の重複に依存しない）
+  // ★チップは必ず .chip-row で包む。2列グリッドの右カラムに収まるので、
+  //   何行に折り返してもラベルの下に回り込まない（ゾーンの境目が見えなくなる原因だった）
   const rows = t.filters.map(gid => {
     const present = presentGroups(key, gid);
     if (!v.sets[gid]) v.sets[gid] = new Set(present.map(x => x[0]));
@@ -1486,18 +1488,25 @@ function renderCardTools(key) {
     const chips = present.map(([k, label, n]) =>
       `<label class="chip"><input type="checkbox" data-fgroup="${gid}" value="${k}" ${set.has(k) ? "checked" : ""}> ${label}<span class="chip-n">${n}</span></label>`).join("");
     return `<div class="filter-group" data-fgroup="${gid}">
-      <span class="filter-label">${esc(FILTER_GROUPS[gid].label)}</span>${chips}
+      <span class="filter-label">${esc(FILTER_GROUPS[gid].label)}</span>
+      <div class="chip-row">${chips}</div>
     </div>`;
   }).join("");
 
   const opts = t.sorts.map(([k, l]) => `<option value="${k}"${v.sort === k ? " selected" : ""}>${esc(l)}</option>`).join("");
   const shown = viewedItems(key).length;
-  el.innerHTML = rows + `
+  // 「すべて表示」と件数は全ゾーンにかかる操作なので、ゾーンの外＝見出し行に置く
+  el.innerHTML = `
+    <div class="tools-head">
+      <span class="tools-title">絞り込み</span>
+      <span class="muted card-tool-count">${shown} / ${all.length}${t.unit}</span>
+      <button class="btn-ghost card-tool-all">すべて表示</button>
+    </div>` + rows + `
     <div class="filter-group">
       <span class="filter-label">並び替え</span>
-      <select class="card-tool-sort" aria-label="並び替え">${opts}</select>
-      <button class="btn-ghost card-tool-all">すべて表示</button>
-      <span class="muted card-tool-count">${shown} / ${all.length}${t.unit}</span>
+      <div class="chip-row">
+        <select class="card-tool-sort" aria-label="並び替え">${opts}</select>
+      </div>
     </div>`;
 
   $$(t.tools + " input[type=checkbox]").forEach(i => i.addEventListener("change", e => {
@@ -2377,7 +2386,9 @@ function visibleRouteIds() {
 }
 function applyFilters() {
   const f = currentFilters();
-  allPlaces().forEach(p => {
+  const all = allPlaces();
+  let shown = 0;
+  all.forEach(p => {
     const id = placeId(p.type, p.name);
     const m = markers[id];
     if (!m) return;
@@ -2385,9 +2396,12 @@ function applyFilters() {
     const pdays = daysOfPlace(id);
     const dayOk = !f.dayFilterOn || pdays.size === 0 || f.days.some(x => pdays.has(x));
     const show = f.type.includes(p.type) && f.status.includes(getStatus(id)) && dayOk && (!f.routeOnly || inRoute);
-    if (show) { if (!markerLayer.hasLayer(m)) m.addTo(markerLayer); }
+    if (show) { shown++; if (!markerLayer.hasLayer(m)) m.addTo(markerLayer); }
     else { if (markerLayer.hasLayer(m)) markerLayer.removeLayer(m); }
   });
+  // カードのツールバーの件数表示と対にする（日で絞ったとき何地点残るか分かる）
+  const c = $("#map-filter-count");
+  if (c) c.textContent = `${shown} / ${all.length}地点`;
 }
 function routeCoords() {
   return visibleRouteIds().map(getPlaceById).filter(Boolean).map(p => p.coords);
