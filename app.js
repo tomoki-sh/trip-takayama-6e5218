@@ -17,6 +17,8 @@ const DATA = {
       area: "高山市上岡本町1丁目124-1",
       coords: [36.1366279, 137.2409008],
       category: "confirmed",
+      spotKey: "landmark",
+      dogKey: "indoor",
       images: ["images/sanctuary.jpg", "images/sanctuary_2.jpg", "images/sanctuary_3.jpg", "images/sanctuary_4.jpg"],
       gmapsPlaceId: "ChIJ_wXHNt-7AmARcVeux1RaQso",
       links: [
@@ -46,6 +48,8 @@ const DATA = {
       area: "高山市上岡本町1丁目590",
       coords: [36.1324902, 137.2350898],
       category: "confirmed",
+      spotKey: "nature",
+      dogKey: "outdoor",
       images: ["images/hidanosato.jpg", "images/hidanosato_2.jpg", "images/hidanosato_3.jpg", "images/hidanosato_4.jpg"],
       gmapsPlaceId: "ChIJmWTYrzm7AmARRPwmwmCypNY",
       links: [
@@ -73,6 +77,8 @@ const DATA = {
       area: "高山市丹生川町日面1147",
       coords: [36.1838158, 137.4248082],
       category: "confirmed",
+      spotKey: "museum",
+      dogKey: "indoor",
       images: ["images/shonyudo.jpg", "images/shonyudo_2.jpg", "images/shonyudo_3.jpg", "images/shonyudo_4.jpg"],
       gmapsPlaceId: "ChIJb0MG_huzAmARweZPSTFdwU0",
       links: [
@@ -101,6 +107,8 @@ const DATA = {
       area: "高山市下三之町",
       coords: [36.144704, 137.2579466],
       category: "confirmed",
+      spotKey: "nature",
+      dogKey: "outdoor",
       images: ["images/asaichi.jpg", "images/asaichi_2.jpg", "images/asaichi_3.jpg", "images/asaichi_4.jpg"],
       gmapsPlaceId: "ChIJE-ywz9a6AmAR1uD5rAwvJkw",
       links: [
@@ -126,6 +134,8 @@ const DATA = {
       area: "高山市上三之町",
       coords: [36.1415725, 137.2595503],
       category: "confirmed",
+      spotKey: "nature",
+      dogKey: "outdoor",
       images: ["images/furuimachi.jpg", "images/furuimachi_2.jpg", "images/furuimachi_3.jpg", "images/furuimachi_4.jpg"],
       gmapsPlaceId: "ChIJwRFeL6y7AmARVwh7E5OUZjU",
       badges: [
@@ -146,6 +156,8 @@ const DATA = {
       area: "高山市上切町311",
       coords: [36.1658853, 137.2353938],
       category: "confirmed",
+      spotKey: "shop",
+      dogKey: "ng",
       images: ["images/ja_agri.jpg", "images/ja_agri_2.jpg", "images/ja_agri_3.jpg", "images/ja_agri_4.jpg"],
       gmapsPlaceId: "ChIJl-mE-uykAmARlK_sknlXmYY",
       links: [
@@ -172,6 +184,8 @@ const DATA = {
       area: "高山市大新町1丁目111",
       coords: [36.1478226, 137.2590789],
       category: "warning",
+      spotKey: "shop",
+      dogKey: "ng",
       images: ["images/shunkei.jpg", "images/shunkei_2.jpg", "images/shunkei_3.jpg", "images/shunkei_4.jpg"],
       gmapsPlaceId: "ChIJc_n34dO6AmARKz-dKlSg_QA",
       links: [
@@ -200,6 +214,8 @@ const DATA = {
       area: "高山市下三之町1-22",
       coords: [36.143711, 137.258495],
       category: "confirmed",
+      spotKey: "shop",
+      dogKey: "indoor",
       images: ["images/takumikan.jpg", "images/takumikan_2.jpg", "images/takumikan_3.jpg", "images/takumikan_4.jpg"],
       gmapsPlaceId: "ChIJZ7QNs9C6AmARb6XBSJZtXbU",
       links: [
@@ -227,6 +243,8 @@ const DATA = {
       area: "高山市上一之町35-1",
       coords: [36.1421962, 137.2609019],
       category: "backup",
+      spotKey: "museum",
+      dogKey: "outdoor",
       images: ["images/taiken.jpg", "images/taiken_2.jpg", "images/taiken_3.jpg", "images/taiken_4.jpg"],
       gmapsPlaceId: "ChIJO7GE7bG7AmAR2nJjojewShg",
       links: [
@@ -251,6 +269,8 @@ const DATA = {
       area: "高山市上岡本町7丁目417-1",
       coords: [36.1462397, 137.2396645],
       category: "backup",
+      spotKey: "nature",
+      dogKey: "outdoor",
       images: ["images/skypark.jpg", "images/skypark_2.jpg", "images/skypark_3.jpg", "images/skypark_4.jpg"],
       gmapsPlaceId: "ChIJoRs_ZsykAmARhmGytR1a6QI",
       links: [
@@ -276,6 +296,8 @@ const DATA = {
       area: "高山市西之一色町3丁目829-4",
       coords: [36.1347761, 137.2387813],
       category: "backup",
+      spotKey: "museum",
+      dogKey: "carry",
       images: ["images/teddy.jpg", "images/teddy_2.jpg", "images/teddy_3.jpg", "images/teddy_4.jpg"],
       gmapsPlaceId: "ChIJd0L6rDC7AmARRrmDkRoO_jg",
       links: [
@@ -300,6 +322,8 @@ const DATA = {
       area: "高山市下一之町6",
       coords: [36.1439748, 137.2599215],
       category: "warning",
+      spotKey: "museum",
+      dogKey: "carry",
       images: ["images/showakan.jpg", "images/showakan_2.jpg", "images/showakan_3.jpg", "images/showakan_4.jpg"],
       gmapsPlaceId: "ChIJAQCsnNC6AmARQM58I5hTRj4",
       links: [
@@ -324,6 +348,8 @@ const DATA = {
       area: "高山市中山町175",
       coords: [36.1561725, 137.2344541],
       category: "warning",
+      spotKey: "museum",
+      dogKey: "ng",
       images: ["images/hikaru.jpg", "images/hikaru_2.jpg", "images/hikaru_3.jpg", "images/hikaru_4.jpg"],
       gmapsPlaceId: "ChIJyW0UYb-kAmAR61qcwFCFu60",
       links: [
@@ -350,6 +376,8 @@ const DATA = {
       area: "高山市城山",
       coords: [36.1400419, 137.263259],
       category: "backup",
+      spotKey: "nature",
+      dogKey: "outdoor",
       images: ["images/shiroyama.jpg", "images/shiroyama_2.jpg", "images/shiroyama_3.jpg", "images/shiroyama_4.jpg"],
       gmapsPlaceId: "ChIJaTYqu8K6AmARgF9gtVFrRRQ",
       links: [
@@ -374,6 +402,8 @@ const DATA = {
       area: "高山市神明町4丁目7",
       coords: [36.1391025, 137.2598451],
       category: "backup",
+      spotKey: "museum",
+      dogKey: "carry",
       images: ["images/retro.png", "images/retro_2.jpg", "images/retro_3.jpg", "images/retro_4.jpg"],
       gmapsPlaceId: "ChIJg5TjDKO7AmARi_2VPbxE2xE",
       links: [
@@ -398,6 +428,8 @@ const DATA = {
       area: "高山市新宮町3423-1",
       coords: [36.1329263, 137.2193586],
       category: "backup",
+      spotKey: "nature",
+      dogKey: "outdoor",
       images: ["images/harayama_dogrun.jpg", "images/harayama_dogrun_2.jpg", "images/harayama_dogrun_3.jpg", "images/harayama_dogrun_4.jpg"],
       gmapsPlaceId: "ChIJQQOTfFO7AmAR7c-i0UehfhQ",
       links: [
@@ -422,6 +454,8 @@ const DATA = {
       area: "高山市丹生川町久手470-1",
       coords: [36.1731642, 137.501819],
       category: "warning",
+      spotKey: "nature",
+      dogKey: "ng",
       images: ["images/wanwan.jpg", "images/wanwan_2.jpg", "images/wanwan_3.jpg", "images/wanwan_4.jpg"],
       gmapsPlaceId: "ChIJ2duhSpFLHWARYtA6Ok02DuQ",
       links: [
@@ -445,6 +479,8 @@ const DATA = {
       area: "高山市奥飛騨温泉郷神坂711-1",
       coords: [36.2825338, 137.5808042],
       category: "warning",
+      spotKey: "nature",
+      dogKey: "carry",
       images: ["images/shinhotaka.jpg", "images/shinhotaka_2.jpg", "images/shinhotaka_3.jpg", "images/shinhotaka_4.jpg"],
       gmapsPlaceId: "ChIJeZr8jcRPHWARO3mNTGG04CE",
       links: [
@@ -470,6 +506,8 @@ const DATA = {
       area: "名神高速道路・滋賀県犬上郡多賀町",
       coords: [35.2179908, 136.2837351],
       category: "confirmed",
+      spotKey: "sapa",
+      dogKey: "outdoor",
       images: ["images/taga_sa.jpg", "images/taga_sa_2.jpg", "images/taga_sa_3.jpg", "images/taga_sa_4.jpg"],
       gmapsPlaceId: "ChIJddh4fqrWA2AR7hfWLcwylFI",
       links: [
@@ -496,6 +534,8 @@ const DATA = {
       area: "東海北陸自動車道・岐阜県関市下有知",
       coords: [35.5091209, 136.8975649],
       category: "confirmed",
+      spotKey: "sapa",
+      dogKey: "outdoor",
       images: ["images/nagaragawa_sa.jpg", "images/nagaragawa_sa_2.jpg", "images/nagaragawa_sa_3.jpg", "images/nagaragawa_sa_4.jpg"],
       gmapsPlaceId: "ChIJfeS1wl0BA2ARGcdNNkkuo58",
       links: [
@@ -522,6 +562,8 @@ const DATA = {
       area: "東海北陸自動車道・岐阜県関市小瀬",
       coords: [35.4903373, 136.8955272],
       category: "confirmed",
+      spotKey: "sapa",
+      dogKey: "outdoor",
       images: ["images/seki_sa.jpg", "images/seki_sa_2.jpg", "images/seki_sa_3.jpg", "images/seki_sa_4.jpg"],
       gmapsPlaceId: "ChIJM1qA-awGA2ARd7ZyexPFIBo",
       links: [
@@ -548,6 +590,8 @@ const DATA = {
       area: "名神高速道路・愛知県一宮市",
       coords: [35.281341, 136.854151],
       category: "backup",
+      spotKey: "sapa",
+      dogKey: "outdoor",
       images: ["images/ichinomiya_pa.jpg", "images/ichinomiya_pa_2.jpg", "images/ichinomiya_pa_3.jpg", "images/ichinomiya_pa_4.jpg"],
       gmapsPlaceId: "ChIJ8_mKerYLA2ARVBZLDyNM72Q",
       links: [
@@ -573,6 +617,8 @@ const DATA = {
       area: "大阪府八尾市北本町2丁目1",
       coords: [34.6297913, 135.6033559],
       category: "confirmed",
+      spotKey: "landmark",
+      dogKey: "outdoor",
       images: ["images/yao.jpg", "images/yao_2.jpg", "images/yao_3.jpg", "images/yao_4.jpg"],
       gmapsPlaceId: "ChIJ08SWbqkgAWARSpZ3KxbU75o",
       badges: [
@@ -593,6 +639,8 @@ const DATA = {
       area: "滋賀県彦根市金亀町1-1",
       coords: [35.276452, 136.251846],
       category: "backup",
+      spotKey: "landmark",
+      dogKey: "outdoor",
       images: ["images/hikone.jpg", "images/hikone_2.jpg", "images/hikone_3.jpg", "images/hikone_4.jpg"],
       gmapsPlaceId: "ChIJw9u_XSsrAmARMIwpeAshKu4",
       links: [
@@ -621,6 +669,7 @@ const DATA = {
       area: "高山市西之一色町3丁目768-2（飛騨の里の近く）",
       coords: [36.1350828, 137.2384975],
       category: "confirmed",
+      dogKey: "indoor",
       genre: "🥩 飛騨牛・郷土料理",
       genreKey: "hida",
       images: ["images/daiki.jpg", "images/daiki_2.jpg", "images/daiki_3.jpg", "images/daiki_4.jpg"],
@@ -651,6 +700,7 @@ const DATA = {
       area: "高山市本町1丁目78",
       coords: [36.1408233, 137.2580421],
       category: "confirmed",
+      dogKey: "indoor",
       genre: "🍳 洋食・カフェごはん",
       genreKey: "western",
       images: ["images/bokunchi.jpg", "images/bokunchi_2.jpg", "images/bokunchi_3.jpg", "images/bokunchi_4.jpg"],
@@ -681,6 +731,7 @@ const DATA = {
       area: "高山市丹生川町坊方1064-1（鍾乳洞と同じ方向）",
       coords: [36.1699647, 137.3228231],
       category: "confirmed",
+      dogKey: "indoor",
       genre: "🍚 自然薯・とろろ",
       genreKey: "jinenjo",
       images: ["images/kurata.jpg", "images/kurata_2.jpg", "images/kurata_3.jpg", "images/kurata_4.jpg"],
@@ -713,6 +764,7 @@ const DATA = {
       area: "高山市初田町3丁目88-5",
       coords: [36.1506458, 137.2522828],
       category: "backup",
+      dogKey: "outdoor",
       genre: "🍝 イタリアン・生パスタ",
       genreKey: "western",
       images: ["images/balfiore.png", "images/balfiore_2.jpg", "images/balfiore_3.jpg", "images/balfiore_4.jpg"],
@@ -742,6 +794,7 @@ const DATA = {
       area: "高山市天満町6丁目8",
       coords: [36.1425437, 137.2541783],
       category: "warning",
+      dogKey: "ng",
       genre: "🥩 飛騨牛・焼肉",
       genreKey: "hida",
       images: ["images/maruaki.jpg", "images/maruaki_2.jpg", "images/maruaki_3.jpg", "images/maruaki_4.jpg"],
@@ -769,6 +822,7 @@ const DATA = {
       area: "高山市上一之町94（古い町並）",
       coords: [36.1410627, 137.261005],
       category: "warning",
+      dogKey: "ng",
       genre: "🍔 飛騨牛バーガー",
       genreKey: "western",
       images: ["images/center4.jpg", "images/center4_2.jpg", "images/center4_3.jpg", "images/center4_4.jpg"],
@@ -801,6 +855,7 @@ const DATA = {
       area: "高山市下三之町58（宮川朝市のすぐそば）",
       coords: [36.1461292, 137.2581945],
       category: "confirmed",
+      dogKey: "indoor",
       genre: "🍡 みたらし団子・自家焙煎コーヒー",
       genreKey: "sweets",
       images: ["images/fukutaro.jpg", "images/fukutaro_2.jpg", "images/fukutaro_3.jpg", "images/fukutaro_4.jpg"],
@@ -831,6 +886,7 @@ const DATA = {
       area: "高山市上三之町93（古い町並）",
       coords: [36.1415608, 137.2596005],
       category: "backup",
+      dogKey: "outdoor",
       genre: "🍵 茶寮・和スイーツ",
       genreKey: "cafe",
       images: ["images/mitsuba.jpg", "images/mitsuba_2.jpg", "images/mitsuba_3.jpg", "images/mitsuba_4.jpg"],
@@ -859,6 +915,7 @@ const DATA = {
       area: "高山市三福寺町4340（市街を見下ろす高台）",
       coords: [36.1513949, 137.2597312],
       category: "backup",
+      dogKey: "outdoor",
       genre: "🌄 眺望カフェ・自家製ケーキ",
       genreKey: "cafe",
       images: ["images/ichii.jpg", "images/ichii_2.jpg", "images/ichii_3.jpg", "images/ichii_4.jpg"],
@@ -886,6 +943,7 @@ const DATA = {
       area: "高山市上一之町35-1（体験交流館の併設）",
       coords: [36.1417628, 137.2606646],
       category: "backup",
+      dogKey: "outdoor",
       genre: "☕ テラスカフェ",
       genreKey: "cafe",
       images: ["images/takayama_terrace.jpg", "images/takayama_terrace_2.jpg", "images/takayama_terrace_3.jpg", "images/takayama_terrace_4.jpg"],
@@ -910,6 +968,7 @@ const DATA = {
       area: "高山市新宮町3391-1（原山市民公園の隣）",
       coords: [36.1337821, 137.2201188],
       category: "backup",
+      dogKey: "outdoor",
       genre: "🐾 ドッグラン隣接カフェ",
       genreKey: "cafe",
       images: ["images/harayama_cafe.jpg", "images/harayama_cafe_2.jpg", "images/harayama_cafe_3.jpg", "images/harayama_cafe_4.jpg"],
@@ -937,6 +996,7 @@ const DATA = {
       area: "高山市上三之町92（古い町並）",
       coords: [36.1416069, 137.2595818],
       category: "warning",
+      dogKey: "ng",
       genre: "🍡 古民家カフェ・わらび餅",
       genreKey: "cafe",
       images: ["images/kissako.jpg", "images/kissako_2.jpg", "images/kissako_3.jpg", "images/kissako_4.jpg"],
@@ -964,6 +1024,7 @@ const DATA = {
       area: "高山市上三之町43-1（古い町並）",
       coords: [36.1424129, 137.2591612],
       category: "backup",
+      dogKey: "ng",
       genre: "🍡 みたらし団子・さるぼぼアイス",
       genreKey: "sweets",
       images: ["images/mikawaya.png", "images/mikawaya_2.jpg", "images/mikawaya_3.jpg", "images/mikawaya_4.jpg"],
@@ -990,6 +1051,7 @@ const DATA = {
       area: "高山市神明町1丁目29",
       coords: [36.1358867, 137.2585199],
       category: "backup",
+      dogKey: "carry",
       genre: "🍝 生パスタ・陶芸体験併設",
       genreKey: "cafe",
       images: ["images/rabbithills.jpg", "images/rabbithills_2.jpg", "images/rabbithills_3.jpg", "images/rabbithills_4.jpg"],
@@ -1017,6 +1079,7 @@ const DATA = {
       area: "高山市丹生川町久手1-5（鍾乳洞と同じ方向）",
       coords: [36.1785142, 137.473619],
       category: "warning",
+      dogKey: "ng",
       genre: "☕ 喫茶・コーヒーハウス",
       genreKey: "cafe",
       images: ["images/parrot.jpg", "images/parrot_2.jpg", "images/parrot_3.jpg", "images/parrot_4.jpg"],
@@ -1286,7 +1349,12 @@ function rerenderStatus() {
   if (typeof map !== "undefined" && map) refreshMarkers();
   if ($("#sched-list")) renderScheduleEditor();
 }
-/* ===== レストラン／カフェの絞り込み・並び替え ===== */
+/* ===== カードの絞り込み・並び替え（スポット／レストラン／カフェ共通） =====
+   絞り込みは「列」を単位にする。列どうしは AND、列の中のチップは OR。
+   例) 種類＝屋内・展示 × 犬＝抱っこ → 抱っこで入れる屋内施設だけが残る。
+   ★状態は cardView（メモリ）だけに持つ。localStorage にも Firebase にも保存しない
+     ＝見る人ごとの一時的な操作であって、同行者の画面まで絞り込まれると事故になる（追補H-9）。 */
+
 // 表示用の genre は店ごとに細かいので、絞り込みはこの粗い区分（genreKey）で行う
 const GENRE_GROUPS = [
   ["hida",    "🥩 飛騨牛・郷土料理"],
@@ -1295,18 +1363,68 @@ const GENRE_GROUPS = [
   ["cafe",    "☕ カフェ・喫茶"],
   ["sweets",  "🍡 甘味・だんご"],
 ];
+// スポットの種類（spotKey）。1地点1区分の排他。
+const SPOT_GROUPS = [
+  ["nature",   "🌲 屋外・自然"],
+  ["museum",   "🏛 屋内・展示"],
+  ["shop",     "🛍 買い物・工芸"],
+  ["sapa",     "🅿️ SA・PA"],
+  ["landmark", "📍 ランドマーク"],
+];
+// 犬の条件（dogKey）。スポットでも店でも同じ語彙を使い回す。
+// ★「種類」とは別の列にするのが要点。飛騨の里は屋外・自然でもあり犬OKでもあるので、
+//   1つの列に混ぜると片方で絞ったときにもう片方から消えてしまう。
+const DOG_GROUPS = [
+  ["indoor",  "🐾 屋内も一緒に"],
+  ["outdoor", "🌿 屋外・テラスのみ"],
+  ["carry",   "🧺 抱っこ・カート・キャリー"],
+  ["ng",      "⚠️ 不可・要確認"],
+];
+// 列の定義。CARD_TABS の filters から参照する
+const FILTER_GROUPS = {
+  genre: { label: "ジャンル", field: "genreKey", groups: GENRE_GROUPS },
+  spot:  { label: "種類",     field: "spotKey",  groups: SPOT_GROUPS },
+  dog:   { label: "犬",       field: "dogKey",   groups: DOG_GROUPS },
+};
 const CARD_SORTS = [
   ["default", "おすすめ順"],
   ["total",   "合計点数の高い順（食べログ＋Google）"],
   ["tabelog", "食べログ点数の高い順"],
   ["google",  "Google点数の高い順"],
 ];
+// スポットには食べログ点数が無いので、店とは別の選択肢にする
+const SPOT_SORTS = [
+  ["default", "おすすめ順"],
+  ["google",  "Google点数の高い順"],
+  ["reviews", "口コミの多い順"],
+];
+// タブを増やすならここに1行足すだけ。filters は FILTER_GROUPS のキーの配列
 const CARD_TABS = {
-  restaurants: { target: "#cards-restaurants", tools: "#tools-restaurants", type: "restaurant", items: () => DATA.restaurants },
-  cafes:       { target: "#cards-cafes",       tools: "#tools-cafes",       type: "cafe",       items: () => DATA.cafes },
+  spots: {
+    target: "#cards-spots", tools: "#tools-spots", type: "spot",
+    filters: ["spot", "dog"], sorts: SPOT_SORTS, unit: "か所",
+    empty: "条件に合う場所がありません。「すべて表示」で戻せます。",
+    items: () => DATA.spots,
+  },
+  restaurants: {
+    target: "#cards-restaurants", tools: "#tools-restaurants", type: "restaurant",
+    filters: ["genre", "dog"], sorts: CARD_SORTS, unit: "店",
+    empty: "条件に合う店がありません。「すべて表示」で戻せます。",
+    items: () => DATA.restaurants,
+  },
+  cafes: {
+    target: "#cards-cafes", tools: "#tools-cafes", type: "cafe",
+    filters: ["genre", "dog"], sorts: CARD_SORTS, unit: "店",
+    empty: "条件に合う店がありません。「すべて表示」で戻せます。",
+    items: () => DATA.cafes,
+  },
 };
-// genres: null = 未初期化（初回に全選択にする）
-const cardView = { restaurants: { genres: null, sort: "default" }, cafes: { genres: null, sort: "default" } };
+// sets[列ID] が未設定 = 未初期化（初回に全選択にする）
+const cardView = {
+  spots:       { sets: {}, sort: "default" },
+  restaurants: { sets: {}, sort: "default" },
+  cafes:       { sets: {}, sort: "default" },
+};
 
 const numOr = (v) => { const n = parseFloat(v); return isNaN(n) ? null : n; };
 // 合計は「片方しか無い店」も比較できるよう、欠けている側を0として足す（＝下に沈む）
@@ -1315,12 +1433,21 @@ function cardScore(p, kind) {
   const g = numOr(p.ratings && p.ratings.google);
   if (kind === "tabelog") return t;
   if (kind === "google")  return g;
+  if (kind === "reviews") return numOr(p.ratings && p.ratings.googleReviews);
   if (kind === "total")   return (t == null && g == null) ? null : (t || 0) + (g || 0);
   return null;
 }
+/* その地点が属する区分。キーの付け忘れは "other" になり、どの区分にも含まれないので
+   静かに一覧から消える（追補D-2c）。tools/test_cardtools.js の「キー欠落の検出」で拾う。 */
+function groupKeyOf(p, gid) { return p[FILTER_GROUPS[gid].field] || "other"; }
+
 function viewedItems(key) {
-  const v = cardView[key], all = CARD_TABS[key].items();
-  const list = all.filter(p => !v.genres || v.genres.has(p.genreKey || "other"));
+  const v = cardView[key], t = CARD_TABS[key], all = t.items();
+  // 列どうしは AND、列の中は OR。未初期化の列は素通しする
+  const list = all.filter(p => t.filters.every(gid => {
+    const set = v.sets[gid];
+    return !set || set.has(groupKeyOf(p, gid));
+  }));
   if (v.sort === "default") return list;
   // 元の並びを保った安定ソート。点数が無い店は末尾へ
   return list.map((p, i) => ({ p, i })).sort((a, b) => {
@@ -1332,41 +1459,60 @@ function viewedItems(key) {
   }).map(x => x.p);
 }
 
-function renderCardTools(key) {
-  const el = $(CARD_TABS[key].tools); if (!el) return;
+/* その旅行に実在する区分だけを [キー, ラベル, 件数] で返す（0件の区分はチップを出さない） */
+function presentGroups(key, gid) {
   const all = CARD_TABS[key].items();
-  const present = GENRE_GROUPS
-    .map(([k, label]) => [k, label, all.filter(p => (p.genreKey || "other") === k).length])
+  return FILTER_GROUPS[gid].groups
+    .map(([k, label]) => [k, label, all.filter(p => groupKeyOf(p, gid) === k).length])
     .filter(x => x[2] > 0);
+}
+/* 全列を全選択に戻す（初期化と「すべて表示」で共用） */
+function resetCardFilters(key) {
   const v = cardView[key];
-  if (!v.genres) v.genres = new Set(present.map(x => x[0]));
+  CARD_TABS[key].filters.forEach(gid => { v.sets[gid] = new Set(presentGroups(key, gid).map(x => x[0])); });
+}
 
-  const chips = present.map(([k, label, n]) =>
-    `<label class="chip"><input type="checkbox" value="${k}" ${v.genres.has(k) ? "checked" : ""}> ${label}<span class="chip-n">${n}</span></label>`).join("");
-  const opts = CARD_SORTS.map(([k, l]) => `<option value="${k}"${v.sort === k ? " selected" : ""}>${esc(l)}</option>`).join("");
+function renderCardTools(key) {
+  const t = CARD_TABS[key];
+  const el = $(t.tools); if (!el) return;
+  const all = t.items();
+  const v = cardView[key];
+
+  // 列ごとにチップを作る。data-fgroup でどの列のチップかを持たせる（値の重複に依存しない）
+  const rows = t.filters.map(gid => {
+    const present = presentGroups(key, gid);
+    if (!v.sets[gid]) v.sets[gid] = new Set(present.map(x => x[0]));
+    const set = v.sets[gid];
+    const chips = present.map(([k, label, n]) =>
+      `<label class="chip"><input type="checkbox" data-fgroup="${gid}" value="${k}" ${set.has(k) ? "checked" : ""}> ${label}<span class="chip-n">${n}</span></label>`).join("");
+    return `<div class="filter-group" data-fgroup="${gid}">
+      <span class="filter-label">${esc(FILTER_GROUPS[gid].label)}</span>${chips}
+    </div>`;
+  }).join("");
+
+  const opts = t.sorts.map(([k, l]) => `<option value="${k}"${v.sort === k ? " selected" : ""}>${esc(l)}</option>`).join("");
   const shown = viewedItems(key).length;
-  el.innerHTML = `
-    <div class="filter-group">
-      <span class="filter-label">ジャンル</span>${chips}
-      <button class="btn-ghost card-tool-all">すべて表示</button>
-    </div>
+  el.innerHTML = rows + `
     <div class="filter-group">
       <span class="filter-label">並び替え</span>
       <select class="card-tool-sort" aria-label="並び替え">${opts}</select>
-      <span class="muted card-tool-count">${shown} / ${all.length}店</span>
+      <button class="btn-ghost card-tool-all">すべて表示</button>
+      <span class="muted card-tool-count">${shown} / ${all.length}${t.unit}</span>
     </div>`;
 
-  $$(CARD_TABS[key].tools + " input[type=checkbox]").forEach(i => i.addEventListener("change", e => {
-    const set = cardView[key].genres, val = e.currentTarget.value;
+  $$(t.tools + " input[type=checkbox]").forEach(i => i.addEventListener("change", e => {
+    const gid = e.currentTarget.dataset.fgroup;
+    const set = cardView[key].sets[gid], val = e.currentTarget.value;
     e.currentTarget.checked ? set.add(val) : set.delete(val);
     renderCardTab(key);
   }));
-  $(CARD_TABS[key].tools + " .card-tool-all").addEventListener("click", () => {
-    cardView[key].genres = new Set(present.map(x => x[0]));
+  // 「すべて表示」は絞り込みと並び替えの両方を初期化する（片方だけ戻ると迷子になる）
+  $(t.tools + " .card-tool-all").addEventListener("click", () => {
+    resetCardFilters(key);
     cardView[key].sort = "default";
     renderCardTab(key);
   });
-  $(CARD_TABS[key].tools + " .card-tool-sort").addEventListener("change", e => {
+  $(t.tools + " .card-tool-sort").addEventListener("change", e => {
     cardView[key].sort = e.currentTarget.value;
     renderCardTab(key);
   });
@@ -1376,15 +1522,14 @@ function renderCardTab(key) {
   renderCardTools(key);
   const t = CARD_TABS[key], list = viewedItems(key);
   const box = $(t.target); if (!box) return;
-  box.innerHTML = list.length
-    ? list.map(p => renderCard({ ...p, type: t.type })).join("")
-    : `<p class="muted">条件に合う店がありません。「すべて表示」で戻せます。</p>`;
+  if (list.length) renderCards(t.target, list, t.type);
+  else box.innerHTML = `<p class="muted">${esc(t.empty)}</p>`;
 }
 
+/* ★カード再描画の唯一の入口。個別に renderCards() を呼ぶとツールバーを通らず、
+   器はあるのに中身が空になる（追補F-11でいちばん時間を溶かした落とし穴）。 */
 function renderAllCards() {
-  renderCards("#cards-spots", DATA.spots, "spot");
-  renderCardTab("restaurants");
-  renderCardTab("cafes");
+  Object.keys(CARD_TABS).forEach(renderCardTab);
 }
 
 /* =========================================================================

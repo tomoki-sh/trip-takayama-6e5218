@@ -371,11 +371,17 @@ a { color: var(--ai); }
 }
 .chip input { accent-color: var(--shu); }
 
-/* ===== レストラン／カフェの絞り込み・並び替えツールバー ===== */
+/* ===== カードの絞り込み・並び替えツールバー（スポット／レストラン／カフェ共通） =====
+   列（種類・犬・ジャンル・並び替え）を縦に積む。ラベル幅を揃えるとチップの左端が
+   そろって、列が2本以上あっても読み違えない。 */
 .card-tools {
-  display: flex; flex-wrap: wrap; gap: .5rem .9rem; align-items: center;
+  display: flex; flex-wrap: wrap; gap: .5rem .9rem; align-items: flex-start;
   background: var(--card); border: 1px solid var(--line); border-radius: 12px;
   padding: .6rem .7rem; margin-bottom: 1rem; box-shadow: var(--shadow);
+}
+.card-tools .filter-group { width: 100%; align-items: baseline; }
+.card-tools .filter-label {
+  flex: none; min-width: 4em; padding-top: .15rem;
 }
 .chip-n {
   margin-left: .3rem; font-size: .72em; font-weight: 700; color: var(--muted);

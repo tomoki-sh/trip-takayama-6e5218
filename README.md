@@ -274,7 +274,31 @@ const TRIP_DAYS = [
 八尾のように往路と復路の両方に出てくる地点があるため、`routeIds` の順ではなく
 **スケジュール順に組み直している**点が要です（そうしないと8/12のナビが逆向きになります）。
 
-## 3. 天気タブ
+## 3. カードの絞り込みを「列」で持つ
+
+`GENRE_GROUPS` だけだった絞り込みを、**列（`FILTER_GROUPS`）を単位にする**形へ広げてある。
+`CARD_TABS` の各タブが `filters: ["spot","dog"]` のように列IDの配列を持ち、
+**列どうしは AND、列の中のチップは OR** で効く。
+
+| 列ID | ラベル | フィールド | 区分 |
+|---|---|---|---|
+| `genre` | ジャンル | `genreKey` | `GENRE_GROUPS`（レストラン・カフェ） |
+| `spot` | 種類 | `spotKey` | `SPOT_GROUPS`（スポットのみ） |
+| `dog` | 犬 | `dogKey` | `DOG_GROUPS`（3タブ共通） |
+
+**なぜ「犬」を別の列にしたか**: 飛騨の里は「屋外・自然」でもあり「犬OK」でもある。
+SA4か所はすべてドッグラン付き。1つの列に混ぜると、片方で絞ったときにもう片方から消えてしまう。
+列を分けることで「**種類＝屋内・展示 × 犬＝屋内も一緒に**」＝雨の日に犬と入れる場所、が出せる。
+
+- **0件の区分はチップを出さない**（`presentGroups()` が `n > 0` だけを通す）
+- **状態は保存しない**。`cardView` はメモリのみで localStorage にも Firebase にも入れない（追補H-9）
+- ⚠️ **`spotKey` / `dogKey` の付け忘れはエラーにならず、その地点が静かに一覧から消える**（追補D-2c）。
+  `tools/test_cardtools.js` の「区分キーの付け忘れ検出」が全39件を検査しているので、
+  **地点を足したら必ずこのテストを流すこと**。
+- カードの再描画は **`renderAllCards()` 一本**に統一済み（追補F-11の再発防止）。
+  `renderCards()` を直接呼ぶ箇所を作らないこと。
+
+## 4. 天気タブ
 
 `loadWeather()` は `DAY_KEYS`（＝`TRIP_DAYS` の日付）すべてを★強調し、
 **日ごとに違う分岐アドバイス**を出します。文言は `loadWeather()` 内の `adviceFor()` にあり、
@@ -285,7 +309,7 @@ const TRIP_DAYS = [
 ```bash
 node --check site/app.js
 node tools/test_site.js site        # 56項目（A〜Q の配線）
-node tools/test_cardtools.js site   # 34項目（絞り込み・並び替え。店名は直書き）
+node tools/test_cardtools.js site   # 63項目（絞り込み・並び替え。店名は直書き）
 node tools/test_info.js site        # 37項目（注意タブの編集・XSS）
 node tools/test_days.js site        # 44項目（★この旅行で追加。日別タブ・日フィルタ）
 ```
