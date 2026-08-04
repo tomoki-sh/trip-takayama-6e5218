@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 116">
+  <!-- 飛騨の杉（背景の一筆） -->
+  <path d="M50 6 L64 34 L57 34 L69 60 L31 60 L43 34 L36 34 Z"
+        fill="#3d6b52" opacity=".9"/>
+  <rect x="47" y="58" width="6" height="10" rx="2" fill="#7a5a34"/>
+  <!-- 肉球（掌球） -->
+  <path d="M50 108 C36 108 27 99 27 89 C27 80 34 74 42 71 C46 69 47 66 50 66
+           C53 66 54 69 58 71 C66 74 73 80 73 89 C73 99 64 108 50 108 Z"
+        fill="#f4efe4" stroke="#2f4f3e" stroke-width="3" stroke-linejoin="round"/>
+  <!-- 指球4つ -->
+  <ellipse cx="28" cy="66" rx="8" ry="10" fill="#f4efe4" stroke="#2f4f3e" stroke-width="3" transform="rotate(-18 28 66)"/>
+  <ellipse cx="42" cy="56" rx="8" ry="10.5" fill="#f4efe4" stroke="#2f4f3e" stroke-width="3" transform="rotate(-7 42 56)"/>
+  <ellipse cx="58" cy="56" rx="8" ry="10.5" fill="#f4efe4" stroke="#2f4f3e" stroke-width="3" transform="rotate(7 58 56)"/>
+  <ellipse cx="72" cy="66" rx="8" ry="10" fill="#f4efe4" stroke="#2f4f3e" stroke-width="3" transform="rotate(18 72 66)"/>
+  <!-- 朱の差し色（掌球のハイライト） -->
+  <path d="M40 84 q10 -6 20 0" fill="none" stroke="#c1432b" stroke-width="3" stroke-linecap="round" opacity=".75"/>
+</svg>
