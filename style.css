@@ -181,8 +181,15 @@ a { color: var(--ai); }
 /* 終了時刻は時刻の下に小さく（.tl-time は .timeline 側で朱・太字） */
 .tl-end { display: block; font-weight: 400; font-size: .78rem; color: var(--muted); }
 /* 予定行から地点カードへのリンク */
-.tl-link { color: var(--ai); text-decoration: underline dotted var(--line); text-underline-offset: 3px; }
-.tl-link:hover { color: var(--shu); }
+/* 予定行に紐づいた地点。★本文からは読み取れないことが多いので必ず名前を出す
+   （例:「彦根 到着見込み」→ 彦根城）。この ref がマップのピン順を決めている */
+.tl-place {
+  display: inline-flex; align-items: center; gap: .25rem; margin-top: .25rem;
+  font-size: .78rem; color: var(--ai); background: var(--kinari-2);
+  border: 1px solid var(--line); border-radius: 999px; padding: .1rem .5rem;
+  text-decoration: none; max-width: 100%;
+}
+.tl-place:hover { border-color: var(--ai-2); color: var(--shu); }
 .timeline .st-chip { margin-left: .4rem; vertical-align: 1px; }
 
 .backup-plan { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); margin-bottom: .6rem; }
@@ -255,6 +262,16 @@ a { color: var(--ai); }
 }
 /* 空行の案内文まで太くしない */
 .sched-text::placeholder { font-weight: 400; color: var(--muted); }
+
+/* 紐づける地点。予定テキストの下に丸ごと1段。★これ1つで「いま何に紐づいているか」の
+   表示と、付け替え・解除を兼ねる。中身は区分ごとの optgroup（placeOptionGroups）。
+   時刻・予定より控えめにして、情報（時刻・予定）が先に目に入る順序を保つ。 */
+.sched-ref {
+  order: 20; flex: 1 0 100%; min-width: 0;
+  border: 1px solid var(--line); border-radius: 7px; padding: .3rem .45rem;
+  font: inherit; font-size: .8rem; background: #fff; color: var(--ai);
+}
+.sched-ref:hover { border-color: var(--ai-2); }
 
 /* 操作＝脇役。薄くしておき、触れたときだけはっきりさせる
    （:focus-visible も戻さないとキーボード操作で見失う） */

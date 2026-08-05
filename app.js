@@ -1840,13 +1840,17 @@ function scheduleRowReadHtml(it) {
   const st = it.ref ? getStatus(it.ref) : (it.status === "confirmed" ? "confirmed" : "tentative");
   const time = it.time || "—";
   const when = it.end ? `${esc(time)}<span class="tl-end">〜${esc(it.end)}</span>` : esc(time);
-  // ref のある行は地点カードへ飛べるようにする（スポット/レストラン/カフェのどのタブでも可）
-  const body = it.ref && getPlaceById(it.ref)
-    ? `<a class="tl-link" href="#" data-goto-ref="${esc(it.ref)}">${esc(it.text || "")}</a>`
-    : esc(it.text || "");
+  /* ★紐づいている地点は名前を出す。本文からは読み取れないことが多いため
+     （例:「彦根 到着見込み」→ 彦根城 / 「八尾を出発」→ 近鉄八尾駅）。
+     この ref がマップのピン順を決めているので、見えないと確認できない。
+     リンクは地点チップだけにする（本文にも張ると1行にリンクが2つになる）。 */
+  const p = it.ref ? getPlaceById(it.ref) : null;
+  const place = p
+    ? `<a class="tl-place" href="#" data-goto-ref="${esc(it.ref)}">${TYPE_ICONS[p.type] || "📍"} ${esc(p.name)}</a>`
+    : "";
   return `<li>
       <span class="tl-time">${when}</span>
-      <span class="tl-body">${body}<span class="st-chip ${st}">${st === "confirmed" ? "確定" : "未確定"}</span></span>
+      <span class="tl-body">${esc(it.text || "")}<span class="st-chip ${st}">${st === "confirmed" ? "確定" : "未確定"}</span>${place}</span>
     </li>`;
 }
 
@@ -1893,9 +1897,8 @@ function renderMasterPlan() {
   $("#plan-edit-all").addEventListener("click", () => openSchedEditor("all"));
   $("#plan-backup").addEventListener("click", exportScheduleAsBackup);
   $("#sched-export").addEventListener("click", exportSchedule);
-  $$("#master-plan .tl-link").forEach(a => a.addEventListener("click", e => {
-    e.preventDefault(); gotoRefCard(a.dataset.gotoRef);
-  }));
+  // 地点チップ（.tl-place）のクリックは init() の委任で拾う。本命プランと予備プランの
+  // 両方が同じ行の描画関数を使うので、描くたびに配線しない
 }
 
 /* 予定行の ref から、その地点のカードタブへ移動して光らせる */
@@ -2203,6 +2206,7 @@ function schedRowHtml(it, i) {
           <button class="sched-rm" data-i="${i}" aria-label="この行を削除">✕</button>
         </span>
         <input class="sched-text" type="text" value="${esc(it.text || "")}" data-i="${i}" placeholder="予定を入力" aria-label="予定">
+        <select class="sched-ref" data-i="${i}" aria-label="紐づける地点">${placeOptionsHtml("📍 地点なし", it.ref || "")}</select>
       </li>`;
 }
 
@@ -2355,6 +2359,20 @@ function renderScheduleEditor() {
   $$("#sched-list .sched-rm").forEach(el => el.addEventListener("click", e => {
     schedule.splice(+e.currentTarget.dataset.i, 1); saveSchedule(); syncRouteFromSchedule(); renderScheduleEditor();
   }));
+  // 地点の紐づけ。★ここを変えるとマップのピン順（ルート）と確定状態の出どころが変わる
+  $$("#sched-list .sched-ref").forEach(el => el.addEventListener("change", e => {
+    const it = schedule[+e.currentTarget.dataset.i], v = e.currentTarget.value;
+    if (v) {
+      // 紐づけると確定状態は共有ステート（getStatus）に従うようになる。表示が切り替わるのは正しい
+      it.ref = v;
+    } else {
+      // 解除するときは、いまの見た目の状態を行に写しておく（勝手に未確定へ落ちないように）
+      it.status = it.ref ? getStatus(it.ref) : (it.status === "confirmed" ? "confirmed" : "tentative");
+      delete it.ref;
+    }
+    // select の change なので再描画してよい（テキスト入力と違いカーソルもIME変換も飛ばない）
+    saveSchedule(); syncRouteFromSchedule(); renderScheduleEditor();
+  }));
   updateSchedDayCounts();
 }
 
@@ -2378,15 +2396,50 @@ function updateSchedDayCounts() {
   });
 }
 
+/* ===== 地点プルダウンの中身 =====
+   ★グループ分けには カードの絞り込みと同じ SPOT_GROUPS / GENRE_GROUPS を使う。
+     語彙を2か所に持たない（0-1）ので、区分を直せば絞り込みと選択の両方に効く。
+     種類（スポット/レストラン/カフェ）の3つだけで分けるとスポットが25件の一かたまりになり、
+     スマホのピッカーで探せない。区分で分けると最大6件になる。 */
+function placeOptionGroups() {
+  const out = [];
+  const push = (label, xs) => { if (xs.length) out.push([label, xs]); };
+  SPOT_GROUPS.forEach(([k, label]) =>
+    push(label, DATA.spots.filter(p => (p.spotKey || "other") === k).map(p => ({ p, type: "spot" }))));
+  const eats = [...DATA.restaurants.map(p => ({ p, type: "restaurant" })),
+                ...DATA.cafes.map(p => ({ p, type: "cafe" }))];
+  GENRE_GROUPS.forEach(([k, label]) =>
+    push(label, eats.filter(x => (x.p.genreKey || "other") === k)));
+  // ★区分キーが付いていない地点を必ず拾う。落とすとその地点だけ紐づけられなくなり、
+  //   しかもエラーが出ない（このプロジェクトで繰り返し起きた「静かに消える」型）。
+  const listed = new Set(out.flatMap(([, xs]) => xs.map(x => placeId(x.type, x.p.name))));
+  push("― 区分なし（キーの付け忘れ）―",
+       allPlaces().filter(p => !listed.has(placeId(p.type, p.name))).map(p => ({ p, type: p.type })));
+  return out;
+}
+/* <select> の中身（先頭の空項目＋optgroup 群）。値は地点id。
+   ★行の紐づけプルダウンと「＋ 候補から追加…」の両方がこれを使う
+     （同じ画面で並びが違うと迷うため）。 */
+function placeOptionsHtml(blankLabel, selectedRef) {
+  const opts = placeOptionGroups().map(([label, xs]) =>
+    `<optgroup label="${esc(label)}">` + xs.map(({ p, type }) => {
+      const id = placeId(type, p.name);
+      return `<option value="${esc(id)}"${id === selectedRef ? " selected" : ""}>${esc(p.name)}</option>`;
+    }).join("") + `</optgroup>`).join("");
+  // ★消えた地点を指している ref を「地点なし」に見せると、他を触った拍子に紐づけが消える。
+  //   選択済みの警告項目として残し、気づけるようにする。
+  const missing = (selectedRef && !getPlaceById(selectedRef))
+    ? `<option value="${esc(selectedRef)}" selected>⚠️ 見つからない地点（${esc(selectedRef)}）</option>` : "";
+  return `<option value=""${selectedRef ? "" : " selected"}>${esc(blankLabel)}</option>${missing}${opts}`;
+}
+
 function populateSchedAddSelect() {
   const sel = $("#sched-add-place"); if (!sel) return;
-  const groups = [["spots", "🌿 スポット"], ["restaurants", "🍽 レストラン"], ["cafes", "☕ カフェ"]];
-  sel.innerHTML = `<option value="">＋ 候補から追加…</option>` + groups.map(([key, label]) =>
-    `<optgroup label="${label}">` + DATA[key].map(p => `<option value="${esc(p.name)}">${esc(p.name)}</option>`).join("") + `</optgroup>`
-  ).join("");
+  sel.innerHTML = placeOptionsHtml("＋ 候補から追加…", "");
   sel.addEventListener("change", () => {
     if (!sel.value) return;
-    insertSchedItem(schedItemFromName(sel.value));
+    const p = getPlaceById(sel.value);
+    if (p) insertSchedItem(schedItemFromName(p.name));
     sel.value = "";
   });
 }
@@ -3270,6 +3323,12 @@ function init() {
   document.addEventListener("click", (e) => {
     const t = e.target.closest("[data-status-toggle]");
     if (t) toggleStatus(t.dataset.statusToggle);
+  });
+
+  // 予定行の地点チップ → その地点のカードへ移動。本命プランと予備プランで共通なので委任で拾う
+  document.addEventListener("click", (e) => {
+    const a = e.target.closest("[data-goto-ref]");
+    if (a) { e.preventDefault(); gotoRefCard(a.dataset.gotoRef); }
   });
 
   // ルート編集ボタン
