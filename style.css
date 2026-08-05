@@ -291,7 +291,6 @@ a { color: var(--ai); }
 }
 
 .sched-hint { margin: .6rem 0 0; font-size: .78rem; line-height: 1.6; }
-.btn-gmaps.too-many { border-color: var(--shu); color: var(--shu); }
 .sched-cand-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .35rem; max-height: 460px; overflow-y: auto; }
 .sched-cand-head { font-size: .76rem; font-weight: 700; color: var(--ai); padding: .35rem .2rem .1rem; position: sticky; top: 0; background: var(--card); }
 .sched-cand-item {
@@ -516,6 +515,12 @@ a { color: var(--ai); }
 .btn-gmaps { background: var(--ai-2); color: #fff; border-color: var(--ai-2); text-decoration: none; }
 .btn-gmaps:hover { background: var(--ai); }
 .btn-gmaps.disabled { opacity: .45; pointer-events: none; }
+/* 経由地が多すぎる警告。★.btn-gmaps は「深緑の塗り＋白文字」なので、
+   文字色だけ朱にすると深緑の上の朱文字になって読めない（実際にそうなっていた）。
+   塗りごと朱に替える（白文字のまま。朱#c1432b × 白 = 5.1:1 で WCAG AA を満たす）。
+   ★.btn-gmaps の規則はこのブロックにまとめる。離れた行に書くと今回の取り違えが起きる。 */
+.btn-gmaps.too-many { background: var(--shu); border-color: var(--shu); color: #fff; }
+.btn-gmaps.too-many:hover { background: #a63822; }
 .route-cols { display: grid; grid-template-columns: 1fr; gap: 1rem; }
 .route-col h4 { margin: 0 0 .4rem; font-size: .92rem; color: var(--ai); }
 .route-list, .candidates-list { list-style: none; margin: 0; padding: 0; min-height: 48px; display: flex; flex-direction: column; gap: .35rem; }
