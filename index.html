@@ -22,7 +22,7 @@
        「新しい index.html ＋ 古い app.js」の組み合わせが起き、
        タブは増えているのに中身が空、という状態になる。
        ★内容を更新して push するときは、必ずこの数字を +1 すること（3か所とも同じ値）。 -->
-  <link rel="stylesheet" href="style.css?v=7fd1a767" />
+  <link rel="stylesheet" href="style.css?v=5357e3ec" />
 </head>
 <body>
   <header class="hero">
@@ -52,45 +52,19 @@
     <!-- スケジュール -->
     <section class="panel active" id="panel-schedule">
       <h2 class="panel-title">スケジュール</h2>
-      <p class="panel-lead"><strong>確定：</strong>8/8〜12の4泊5日、拠点は<strong>サンクチュアリコート高山</strong>。<strong>朝食と夕食はホテル</strong>（8/8イタリアン・8/9日本料理・8/10イタリアン・8/11鉄板焼き）。<strong>午前に主目的をひとつ＋犬と入れる昼食＋13時台にはホテルへ戻る</strong>のが毎日の型です。<strong>8/13は旅程に含まれません。</strong>下のリストは<strong>ドラッグで並び替え／時刻入力／確定・未確定の切替</strong>ができ、変更は<strong>同行者の端末にもリアルタイムで反映</strong>されます。</p>
+      <p class="panel-lead"><strong>確定：</strong>8/8〜12の4泊5日、拠点は<strong>サンクチュアリコート高山</strong>。<strong>朝食と夕食はホテル</strong>（8/8イタリアン・8/9日本料理・8/10イタリアン・8/11鉄板焼き）。<strong>午前に主目的をひとつ＋犬と入れる昼食＋13時台にはホテルへ戻る</strong>のが毎日の型です。<strong>8/13は旅程に含まれません。</strong>下の<strong>本命プラン</strong>が全員で共有している旅程で、変更は<strong>同行者の端末にもリアルタイムで反映</strong>されます。<strong>「編集」ボタンを押すまでは編集されません</strong>ので、誤ってスクロール中に予定が入れ替わることはありません。</p>
 
-      <div class="sched-editor">
-        <div class="sched-legend">
-          <span class="st-chip confirmed">確定</span><span>ホテル・固定夕食・飛騨の里・鍾乳洞・JA・SA休憩</span>
-          <span class="st-chip tentative">未確定</span><span>昼食の店・匠館・山田春慶店・スカイパーク（タップで切替）</span>
-        </div>
+      <!-- 本命プラン（読む形式）。中身は app.js の renderMasterPlan() が schedule から描く -->
+      <div id="master-plan"></div>
 
-        <!-- ★4泊5日対応: 全体／日別のサブタブ。データは1本なので双方が即座に連動する -->
-        <div class="sched-day-tabs" id="sched-day-tabs" aria-label="日の切替"></div>
+      <!-- 編集セクション。★編集モードでないときは DOM ごと描かない（誤タップ防止）。
+           中身は app.js の renderSchedEditorSection() が組み立てる -->
+      <div id="sched-editor-host"></div>
 
-        <div class="sched-cols">
-          <div class="sched-col">
-            <h4 class="sched-col-h">タイムスケジュール <span class="muted">ドラッグ並び替え・時刻入力・確定切替</span></h4>
-            <ol class="sched-list" id="sched-list"></ol>
-            <div class="sched-toolbar">
-              <select id="sched-add-place" class="sched-select"><option value="">＋ 候補から追加…</option></select>
-              <button class="btn-ghost" id="sched-add-row">＋ 空の行</button>
-              <button class="btn-ghost" id="sched-reset">おすすめ順に戻す</button>
-              <button class="btn-ghost" id="sched-clear">空にする</button>
-              <button class="btn-ghost" id="sched-save-plan">プラン例に保存</button>
-              <button class="btn-ghost" id="sched-export">共有用に書き出す</button>
-            </div>
-            <p class="sched-hint muted">「全体」では日付の見出し行を挟んで5日ぶんを通しで表示します。<strong>行を別の日の見出しの下へドラッグすると、その予定の日付が切り替わります。</strong>「＋ 空の行」「おすすめ順に戻す」「空にする」は、日別タブを開いているときはその日だけに効きます。</p>
-          </div>
-          <div class="sched-col">
-            <h4 class="sched-col-h">候補リスト <span class="muted">ドラッグ or ⊕ で左へ追加</span></h4>
-            <div class="sched-cand-tabs" id="sched-cand-tabs">
-              <button class="sched-cand-tab active" data-filter="all">すべて</button>
-              <button class="sched-cand-tab" data-filter="spots">🌿 スポット</button>
-              <button class="sched-cand-tab" data-filter="restaurants">🍽 レストラン</button>
-              <button class="sched-cand-tab" data-filter="cafes">☕ カフェ</button>
-            </div>
-            <ul class="sched-cand-list" id="sched-candidates"></ul>
-          </div>
-        </div>
-      </div>
+      <!-- 予備プラン（本命から書き出した控え。ユーザー間で同期する） -->
+      <div id="backup-plans"></div>
 
-      <h3 class="sched-subhead">プラン例（参考）</h3>
+      <h3 class="sched-subhead">当日の調整方針</h3>
       <div id="schedule-content"></div>
     </section>
 
@@ -221,7 +195,7 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
           integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js" defer></script>
-  <script src="app.js?v=7fd1a767" defer></script>
+  <script src="app.js?v=5357e3ec" defer></script>
 
   <!-- Firebase リアルタイム同期（スケジュール・確定状態・ルートを全員で共有）
        apiKey 等は秘密情報ではなく識別子。保護は Realtime Database のルール（匿名ログイン限定）で行う。 -->

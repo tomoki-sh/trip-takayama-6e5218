@@ -156,18 +156,48 @@ a { color: var(--ai); }
 .tag.alt { background: #e7decb; color: #6a5d3c; }
 .tag.opt { background: #e0eef0; color: #1f7a7a; }
 .tag.user { background: var(--cyan); color: #fff; }
-.plan-card.userplan { border-left: 4px solid var(--cyan); }
 .plan-list { list-style: none; margin: 0; padding: 0; }
-.plan-list-tools { margin: .6rem 0 0; }
-.plan-handle { cursor: grab; color: var(--muted); font-size: 1.15rem; padding: 0 .15rem; touch-action: none; user-select: none; }
+.plan-list-tools { margin: .6rem 0 0; display: flex; gap: .4rem; flex-wrap: wrap; }
 .plan-actions { margin-left: auto; display: flex; gap: .3rem; flex-wrap: wrap; }
-.plan-del, .plan-export, .plan-copy { border: 1px solid var(--line); background: #fff; font: inherit; font-size: .74rem; padding: .15rem .55rem; border-radius: 999px; cursor: pointer; }
-.plan-del { color: var(--shu); }
-.plan-del:hover { background: #fbe3df; }
-.plan-export { color: var(--cyan); }
-.plan-export:hover { background: #def0f0; }
-.plan-copy { color: var(--ai); }
-.plan-copy:hover { background: var(--kinari-2); }
+.plan-del, .plan-copy, .plan-edit, .bp-restore, .bp-copy, .bp-del {
+  border: 1px solid var(--line); background: #fff; font: inherit; font-size: .74rem;
+  padding: .15rem .55rem; border-radius: 999px; cursor: pointer;
+}
+.plan-del, .bp-del { color: var(--shu); }
+.plan-del:hover, .bp-del:hover { background: #fbe3df; }
+.plan-copy, .bp-copy { color: var(--ai); }
+.plan-copy:hover, .bp-copy:hover { background: var(--kinari-2); }
+
+/* ===== 本命プラン / 予備プラン（★2026-08 追加） =====
+   本命は schedule そのもの、予備はその控え。どちらも .plan-card / .timeline で描く。 */
+.plan-section-head { display: flex; align-items: baseline; gap: .6rem; flex-wrap: wrap; }
+.plan-section-head .sched-subhead { margin-bottom: .3rem; }
+.plan-section-head .muted { font-size: .8rem; }
+/* 「編集」は本命プランの主操作なので、他のピルより目立たせる */
+.plan-edit { margin-left: auto; color: #fff; background: var(--ai-2); border-color: var(--ai-2); font-weight: 700; }
+.plan-edit:hover { background: var(--ai); }
+.bp-restore { color: #fff; background: var(--shu); border-color: var(--shu); font-weight: 700; }
+.bp-restore:hover { background: #a63822; }
+/* 終了時刻は時刻の下に小さく（.tl-time は .timeline 側で朱・太字） */
+.tl-end { display: block; font-weight: 400; font-size: .78rem; color: var(--muted); }
+/* 予定行から地点カードへのリンク */
+.tl-link { color: var(--ai); text-decoration: underline dotted var(--line); text-underline-offset: 3px; }
+.tl-link:hover { color: var(--shu); }
+.timeline .st-chip { margin-left: .4rem; vertical-align: 1px; }
+
+.backup-plan { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); margin-bottom: .6rem; }
+.backup-plan > summary { cursor: pointer; padding: .6rem .8rem; display: flex; align-items: center; gap: .5rem; font-weight: 700; color: var(--ai); }
+.backup-plan[open] > summary { border-bottom: 1px solid var(--line); }
+.backup-plan .bp-title { flex: 1; min-width: 0; }
+.backup-plan .plan-actions { padding: .6rem .8rem 0; margin-left: 0; }
+.backup-plan .plan-list { padding: .2rem .8rem .8rem; }
+
+/* 編集セクション。★編集モードのときだけ DOM が存在する（誤タップ防止。追補E） */
+.sched-editor.is-editing { border: 2px solid var(--ai-2); }
+.sched-edit-head { display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; }
+.sched-edit-head .sched-subhead { margin: 0; flex: 1; min-width: 0; }
+.btn-primary { background: var(--ai-2); color: #fff; border: 1px solid var(--ai-2); border-radius: 999px; padding: .35rem .9rem; font: inherit; font-size: .84rem; font-weight: 700; cursor: pointer; }
+.btn-primary:hover { background: var(--ai); }
 
 .branch-grid { display: grid; gap: .7rem; grid-template-columns: 1fr; margin-top: .4rem; }
 .branch {

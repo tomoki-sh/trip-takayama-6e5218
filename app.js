@@ -1132,101 +1132,6 @@ const DATA = {
     }
   ],
 
-  /* === プラン例（日別） === */
-  plans: [
-    {
-      title: "8/8（土）｜八尾 → 高山・移動だけの日",
-      featured: true,
-      route: "13時以降の出発。観光は一切入れず、ホテル到着を最優先",
-      items: [
-        ["12:00", "八尾で昼食を済ませる（SAでの食事休憩は省く）", "確定"],
-        ["13:00", "八尾を出発（13時に近いほどよい）", "確定"],
-        ["15:30", "多賀SA（上り）などで犬の休憩・排泄・給水", "未確定"],
-        ["17:30", "必要なら2回目の休憩（長良川SAを固定しない）", "未確定"],
-        ["18:30", "サンクチュアリコート高山 到着見込み（〜20:00）", "確定"],
-        ["20:00", "ホテルのイタリアン（固定・開始時刻をホテルに相談）", "確定"]
-      ]
-    },
-    {
-      title: "8/9（日）｜飛騨の里 ＋ 大喜",
-      featured: true,
-      route: "ホテルから近い場所だけ。前日の到着が遅い前提",
-      items: [
-        ["07:30", "ホテル朝食", "確定"],
-        ["08:15", "犬の排泄・給水", "確定"],
-        ["08:30", "飛騨の里（開園直後・1時間45分ほど）", "確定"],
-        ["10:45", "お食事処 大喜で昼食（要予約・犬と店内）", "未確定"],
-        ["12:15", "ホテルへ戻る", "確定"],
-        ["13:00", "客室・館内・ドッグランで休憩", "確定"],
-        ["18:30", "ホテルの日本料理（固定）", "確定"],
-        ["19:30", "手筒花火。犬は連れて行かず客室で音対策", "確定"]
-      ]
-    },
-    {
-      title: "8/10（月）｜JA ＋ 光ミュージアム ＋ ぼくんち",
-      featured: true,
-      route: "必須施設の日。光ミュージアムの間だけ犬は客室で留守番",
-      items: [
-        ["07:15", "ホテル朝食", "確定"],
-        ["08:00", "犬の散歩・排泄・給水", "確定"],
-        ["08:20", "犬も車に乗せてホテル出発", "確定"],
-        ["08:35", "JA産直市場アグリ高山（交代で入店）", "確定"],
-        ["09:05", "ホテルへ戻る", "確定"],
-        ["09:20", "犬の給水・室温調整・ケージで待機の準備", "確定"],
-        ["09:40", "大人だけで出発（客室待機はホテルへ要確認）", "未確定"],
-        ["10:00", "光ミュージアム（開館直後・2時間）", "未確定"],
-        ["12:15", "ホテルへ戻り犬を迎える（留守番は約2時間半）", "確定"],
-        ["12:30", "ぼくんちで昼食（犬と店内・大型犬可）", "未確定"],
-        ["14:00", "ホテルへ戻る（午後はホテルステイ）", "確定"],
-        ["18:30", "ホテルのイタリアン（固定）", "確定"]
-      ]
-    },
-    {
-      title: "8/11（火・祝）｜飛騨大鍾乳洞 ＋ 茶茶",
-      featured: true,
-      route: "山の日の市街地混雑を避けて郊外へ",
-      items: [
-        ["07:00", "ホテル朝食", "確定"],
-        ["08:00", "ホテル出発", "確定"],
-        ["08:30", "飛騨大鍾乳洞（約12℃・上着とすべりにくい靴）", "確定"],
-        ["10:30", "じねんのむら茶茶（予約不可・当日朝に電話確認）", "未確定"],
-        ["12:30", "ホテルへ戻る（午後はホテルステイ）", "確定"],
-        ["18:30", "ホテルの鉄板焼き（固定・同席者が1名増える予定）", "確定"],
-        ["19:30", "久々野の花火（〜22:30）。犬の音対策", "確定"]
-      ]
-    },
-    {
-      title: "8/12（水）｜山田春慶店 → 彦根 → 八尾",
-      featured: true,
-      route: "臨時休業明け初日。開店直後を狙って早めに出発",
-      items: [
-        ["07:30", "ホテル朝食", "確定"],
-        ["08:15", "荷造り・犬の散歩・給水", "確定"],
-        ["09:00", "チェックアウト", "確定"],
-        ["09:20", "ホテル出発", "確定"],
-        ["09:40", "山田春慶店付近の駐車場へ（専用駐車場なし）", "確定"],
-        ["10:00", "山田春慶店（前日と当日朝に電話確認・1人が犬と待機）", "未確定"],
-        ["11:00", "高山から彦根へ出発（遅くとも11:10）", "確定"],
-        ["13:00", "SA・PAで昼食と犬の休憩", "未確定"],
-        ["14:30", "彦根 到着見込み（〜15:30）", "確定"],
-        ["17:00", "彦根で休憩後、同行者と犬2匹は八尾へ", "確定"]
-      ]
-    },
-    {
-      title: "雨・猛暑のときの差し替え版",
-      featured: false,
-      route: "屋外を削り、犬と入れる屋内だけで組む",
-      items: [
-        ["08:30", "飛騨大鍾乳洞（雨でも実施可・足元に注意）", "未確定"],
-        ["09:00", "匠館（全フロア犬同伴可・宮川朝市のとなり）", "未確定"],
-        ["10:00", "光ミュージアム（大人のみ・犬は客室で留守番）", "未確定"],
-        ["11:00", "ぼくんち または 大喜（どちらも犬と店内）", "未確定"],
-        ["12:30", "ホテルへ戻り、午後は客室とドッグラン", "確定"],
-        ["終日", "強雨・雷ならホテルステイのみ。屋外はすべて中止", "未確定"]
-      ]
-    }
-  ],
-
   /* === 当日の調整方針 === */
   branches: [
     { cls: "sun", title: "☀️ 晴れ・猛暑のとき", text: "屋外は開園直後の飛騨の里と朝市だけに限定し、11時以降は歩かせない。昼は犬と店内に入れる大喜・ぼくんちを優先し、テラスだけの三葉・Ichii・Takayama terrace は避ける。スカイパークは夕方だけ。午後はホテルの客室とドッグランで休む。" },
@@ -1910,150 +1815,202 @@ function renderCards(targetId, items, type) {
 /* =========================================================================
    スケジュール / ルート / 持ち物 / 注意
    ========================================================================= */
-function planCardHtml(pl, opts = {}) {
-  const isUser = opts.kind === "user";
-  const tl = pl.items.map(([t, b, s]) =>
-    `<li><span class="tl-time">${esc(t)}</span><span class="tl-body">${esc(b)}${s ? `<span class="tl-sub">${esc(s)}</span>` : ""}</span></li>`
-  ).join("");
-  const tag = isUser
-    ? `<span class="tag user">保存</span>`
-    : (pl.tag ? `<span class="tag top">${esc(pl.tag)}</span>` : (pl.featured ? '<span class="tag top">本命</span>' : '<span class="tag alt">別案</span>'));
-  const exportBtn = isUser ? `<button class="plan-export" data-key="${esc(opts.key)}">共有用に書き出す</button>` : "";
-  const actions = `<div class="plan-actions">
-      <button class="plan-copy" data-key="${esc(opts.key)}">コピー</button>
-      ${exportBtn}
-      <button class="plan-del" data-key="${esc(opts.key)}" aria-label="このプランを削除">削除</button>
-    </div>`;
-  return `<div class="plan-card ${pl.featured ? "featured" : ""} ${isUser ? "userplan" : ""}" data-key="${esc(opts.key)}">
-      <div class="plan-head"><span class="plan-handle" title="ドラッグで並び替え">≡</span><h3>${esc(pl.title)}</h3>${tag}${actions}</div>
-      ${pl.route ? `<p class="plan-route">${esc(pl.route)}</p>` : ""}
-      <ol class="timeline">${tl}</ol>
-    </div>`;
-}
+/* =========================================================================
+   スケジュールの「読む」表示（②形式）
 
-/* 組込(DATA.plans)＋保存プランを安定キー付きで統合 */
-function masterPlans() {
-  return [
-    ...DATA.plans.map(p => ({ plan: p, key: "b:" + p.title, kind: "builtin" })),
-    ...userPlans.map(p => ({ plan: p, key: "u:" + p.id, kind: "user" }))
-  ];
-}
-function findPlanByKey(key) { return masterPlans().find(e => e.key === key); }
-function orderedPlans() {
-  const list = masterPlans().filter(e => !planView.hidden.includes(e.key));
-  const rank = k => { const i = planView.order.indexOf(k); return i < 0 ? Infinity : i; };
-  return list.map((e, i) => ({ e, i }))
-    .sort((a, b) => (rank(a.e.key) - rank(b.e.key)) || (a.i - b.i))
-    .map(x => x.e);
-}
+   ★本命プラン（schedule）と予備プラン（plans[].items）は同じ形の行を持つので、
+     描画はこの1本だけ。二重に実装しない（0-1）。
+     行の形 = { day, time, end, text, status, ref }
+   ========================================================================= */
 
-function renderSchedule() {
-  const cards = orderedPlans().map(e => planCardHtml(e.plan, { key: e.key, kind: e.kind })).join("");
-  const hiddenN = planView.hidden.length;
-  const reset = (planView.order.length || hiddenN)
-    ? `<div class="plan-list-tools"><button class="btn-ghost" id="plan-view-reset">並び順・表示をリセット${hiddenN ? `（非表示 ${hiddenN} 件）` : ""}</button></div>`
-    : "";
-  const branches = `<h3 style="color:var(--ai);margin:1.4rem 0 .6rem;">当日の調整方針</h3>
-    <div class="branch-grid">${DATA.branches.map(b =>
-      `<div class="branch ${b.cls}"><h4>${esc(b.title)}</h4><p>${esc(b.text)}</p></div>`).join("")}</div>`;
-  $("#schedule-content").innerHTML =
-    `<div class="plan-list" id="plan-list">${cards || '<p class="muted">表示できるプランがありません。</p>'}</div>${reset}${branches}`;
-  $$("#plan-list .plan-copy").forEach(b => b.addEventListener("click", () => copyPlan(b.dataset.key, b)));
-  $$("#plan-list .plan-del").forEach(b => b.addEventListener("click", () => deletePlanByKey(b.dataset.key)));
-  $$("#plan-list .plan-export").forEach(b => b.addEventListener("click", () => exportUserPlanToData(+b.dataset.key.slice(2))));
-  const rb = $("#plan-view-reset");
-  if (rb) rb.addEventListener("click", () => { planView = { order: [], hidden: [] }; savePlanView(); renderSchedule(); });
-  setupPlanSortable();
-}
-
-/* プラン例のドラッグ並び替え（ハンドル ≡） */
-function setupPlanSortable() {
-  const el = $("#plan-list");
-  if (!el || typeof Sortable === "undefined") return;
-  Sortable.create(el, {
-    animation: 150, handle: ".plan-handle", draggable: ".plan-card",
-    ghostClass: "sortable-ghost", chosenClass: "sortable-chosen",
-    onEnd: () => {
-      planView.order = $$("#plan-list .plan-card").map(c => c.dataset.key);
-      savePlanView();
-    }
+/* 行を日ごとにまとめる（TRIP_DAYS の順。day を持たない行は初日に寄せる） */
+function rowsByDay(rows) {
+  const m = new Map();
+  rows.forEach(it => {
+    const d = normalizeDay(it.day);
+    if (!m.has(d)) m.set(d, []);
+    m.get(d).push(it);
   });
+  return DAY_KEYS.filter(d => m.has(d)).map(d => ({ day: d, rows: m.get(d) }));
 }
 
-/* プラン内容をテキストでコピー（LINE等に貼れる形式） */
-function copyPlan(key, btn) {
-  const e = findPlanByKey(key); if (!e) return;
-  const pl = e.plan;
-  const text = `【${pl.title}】` + (pl.route ? `\n${pl.route}` : "") + "\n" +
-    pl.items.map(([t, b, s]) => `${t}  ${b}${s ? `（${s}）` : ""}`).join("\n");
+/* 1行ぶんの「読む」表示。★表示専用。入力欄もトグルも出さない（誤タップ対策）。 */
+function scheduleRowReadHtml(it) {
+  // 確定状態は ref があれば全タブ共有のものを引く（プラン内の文字列ではなく“いまの本物”）
+  const st = it.ref ? getStatus(it.ref) : (it.status === "confirmed" ? "confirmed" : "tentative");
+  const time = it.time || "—";
+  const when = it.end ? `${esc(time)}<span class="tl-end">〜${esc(it.end)}</span>` : esc(time);
+  // ref のある行は地点カードへ飛べるようにする（スポット/レストラン/カフェのどのタブでも可）
+  const body = it.ref && getPlaceById(it.ref)
+    ? `<a class="tl-link" href="#" data-goto-ref="${esc(it.ref)}">${esc(it.text || "")}</a>`
+    : esc(it.text || "");
+  return `<li>
+      <span class="tl-time">${when}</span>
+      <span class="tl-body">${body}<span class="st-chip ${st}">${st === "confirmed" ? "確定" : "未確定"}</span></span>
+    </li>`;
+}
+
+/* 行の集まりを日ごとのカードで描く。opts.editable=true なら日ごとに「編集」ボタンを出す。 */
+function scheduleCardsHtml(rows, opts = {}) {
+  const groups = rowsByDay(rows);
+  if (!groups.length) return `<p class="muted">予定がありません。</p>`;
+  return groups.map(g => {
+    const edit = opts.editable
+      ? `<button class="plan-edit" data-edit-day="${esc(g.day)}">編集</button>` : "";
+    return `<div class="plan-card featured" data-day="${esc(g.day)}">
+      <div class="plan-head"><h3>${esc(dayLabel(g.day))}</h3>
+        <span class="tag top">${g.rows.length}件</span>${edit}</div>
+      ${daySub(g.day) ? `<p class="plan-route">${esc(daySub(g.day))}</p>` : ""}
+      <ol class="timeline">${g.rows.map(scheduleRowReadHtml).join("")}</ol>
+    </div>`;
+  }).join("");
+}
+
+/* ---- 本命プラン（= schedule そのもの） ---- */
+function renderMasterPlan() {
+  const box = $("#master-plan"); if (!box) return;
+  box.innerHTML = `
+    <div class="plan-section-head">
+      <h3 class="sched-subhead">本命プラン</h3>
+      <span class="muted">全員で共有している旅程です。変更は同行者にもすぐ反映されます</span>
+    </div>
+    <div class="plan-list">${scheduleCardsHtml(schedule, { editable: true })}</div>
+    <div class="plan-list-tools">
+      <button class="btn-ghost" id="plan-edit-all">全体を編集</button>
+      <button class="btn-ghost" id="plan-backup">予備プランへ書き出す</button>
+      <button class="btn-ghost" id="sched-export">共有用に書き出す</button>
+    </div>`;
+  $$("#master-plan .plan-edit").forEach(b =>
+    b.addEventListener("click", () => openSchedEditor(b.dataset.editDay)));
+  $("#plan-edit-all").addEventListener("click", () => openSchedEditor("all"));
+  $("#plan-backup").addEventListener("click", exportScheduleAsBackup);
+  $("#sched-export").addEventListener("click", exportSchedule);
+  $$("#master-plan .tl-link").forEach(a => a.addEventListener("click", e => {
+    e.preventDefault(); gotoRefCard(a.dataset.gotoRef);
+  }));
+}
+
+/* 予定行の ref から、その地点のカードタブへ移動して光らせる */
+function gotoRefCard(ref) {
+  const type = String(ref).split(":")[0];
+  const tabOf = { spot: "spots", restaurant: "restaurants", cafe: "cafes" }[type];
+  if (!tabOf) return;
+  const tab = $$("#tabs .tab").find(t => t.dataset.tab === tabOf);
+  if (tab) tab.click();
+  setTimeout(() => gotoPlaceCard(tabOf, ref), 60);
+}
+
+/* ---- 予備プラン（本命から書き出した控え。ユーザー間で同期する） ---- */
+function renderBackupPlans() {
+  const box = $("#backup-plans"); if (!box) return;
+  const rank = k => { const i = planView.order.indexOf(k); return i < 0 ? Infinity : i; };
+  const list = plans.slice().map((p, i) => ({ p, i }))
+    .sort((a, b) => (rank("u:" + a.p.id) - rank("u:" + b.p.id)) || (a.i - b.i)).map(x => x.p);
+  const cards = list.map(p => `
+    <details class="backup-plan" data-id="${p.id}">
+      <summary><span class="bp-title">${esc(p.title)}</span>
+        <span class="tag alt">${(p.items || []).length}件</span></summary>
+      <div class="plan-actions">
+        <button class="bp-restore" data-id="${p.id}">本命へ上書き</button>
+        <button class="bp-copy" data-id="${p.id}">コピー</button>
+        <button class="bp-del" data-id="${p.id}" aria-label="この予備プランを削除">削除</button>
+      </div>
+      <div class="plan-list">${scheduleCardsHtml(p.items || [])}</div>
+    </details>`).join("");
+  box.innerHTML = `
+    <div class="plan-section-head">
+      <h3 class="sched-subhead">予備プラン</h3>
+      <span class="muted">本命プランの控え。同行者にも共有されます</span>
+    </div>
+    ${cards || '<p class="muted">まだありません。本命プランの「予備プランへ書き出す」で控えを残せます。</p>'}`;
+  $$("#backup-plans .bp-restore").forEach(b => b.addEventListener("click", () => restoreBackupPlan(+b.dataset.id)));
+  $$("#backup-plans .bp-copy").forEach(b => b.addEventListener("click", () => copyBackupPlan(+b.dataset.id, b)));
+  $$("#backup-plans .bp-del").forEach(b => b.addEventListener("click", () => deleteBackupPlan(+b.dataset.id)));
+}
+
+/* 現在の本命プランを予備プランへ複製する。
+   ★日で絞るのは「編集セクションを開いてその日を見ているとき」だけ。
+     schedDayView は編集を閉じても最後の日が残るので、これを条件にすると
+     全体を控えたつもりが1日ぶんだけ書き出される（静かに間違う）。 */
+function exportScheduleAsBackup() {
+  const scope = (schedEditing && schedEditing !== "all") ? schedEditing : null;
+  const src = scope ? schedule.filter(it => normalizeDay(it.day) === scope) : schedule;
+  if (!src.length) { window.alert("本命プランが空です。先に予定を入れてください。"); return; }
+  const def = scope ? `${dayLabel(scope)} の控え` : `本命の控え ${plans.length + 1}`;
+  const title = (window.prompt("予備プランの名前を入力してください:", def) || "").trim();
+  if (!title) return;
+  const id = plans.reduce((m, p) => Math.max(m, p.id || 0), 0) + 1;
+  // ★行をそのまま複製する（ref・day・end を落とさない。落とすと上書き時に連動が壊れる）
+  plans.push({ id, title, items: JSON.parse(JSON.stringify(src)) });
+  savePlans();
+  renderBackupPlans();
+  window.alert(`「${title}」を予備プランに残しました。`);
+}
+
+/* 予備プランで本命プランを置き換える（★破壊的。同行者の画面にも即反映される） */
+function restoreBackupPlan(id) {
+  const p = plans.find(x => x.id === id); if (!p) return;
+  if (!window.confirm(
+      `「${p.title}」で本命プランを置き換えます。\n\n`
+    + `現在の本命プラン（${schedule.length}件）は失われます。\n`
+    + `同行者の画面にもすぐ反映されます。よろしいですか？`)) return;
+  schedule = JSON.parse(JSON.stringify(p.items || []));
+  saveSchedule();
+  syncRouteFromSchedule();
+  rerenderAll();
+  window.alert(`本命プランを「${p.title}」に置き換えました。`);
+}
+
+function deleteBackupPlan(id) {
+  const p = plans.find(x => x.id === id); if (!p) return;
+  if (!window.confirm(`予備プラン「${p.title}」を削除しますか？（同行者の画面からも消えます）`)) return;
+  plans = plans.filter(x => x.id !== id);
+  planView.order = planView.order.filter(k => k !== "u:" + id);
+  savePlanView();
+  savePlans();
+  renderBackupPlans();
+}
+
+/* 予備プランをテキストでコピー（LINE等に貼れる形式） */
+function copyBackupPlan(id, btn) {
+  const p = plans.find(x => x.id === id); if (!p) return;
+  const text = `【${p.title}】\n` + rowsByDay(p.items || []).map(g =>
+    `■ ${dayLabel(g.day)}\n` + g.rows.map(it => {
+      const st = it.ref ? getStatus(it.ref) : (it.status === "confirmed" ? "confirmed" : "tentative");
+      return `${it.time || "—"}${it.end ? "〜" + it.end : ""}  ${it.text || ""}（${st === "confirmed" ? "確定" : "未確定"}）`;
+    }).join("\n")).join("\n\n");
   const done = () => { if (btn) { const o = btn.textContent; btn.textContent = "コピー済"; setTimeout(() => { btn.textContent = o; }, 1200); } };
   if (navigator.clipboard) navigator.clipboard.writeText(text).then(done, () => window.prompt("コピーしてください:", text));
   else window.prompt("コピーしてください:", text);
 }
 
-/* 削除: 保存プランは実削除、組込プランはこの端末で非表示（リセットで復活） */
-function deletePlanByKey(key) {
-  const e = findPlanByKey(key); if (!e) return;
-  if (e.kind === "user") {
-    if (!window.confirm(`「${e.plan.title}」を削除しますか？`)) return;
-    const id = +key.slice(2);
-    userPlans = userPlans.filter(p => p.id !== id);
-    saveUserPlans();
-    planView.order = planView.order.filter(k => k !== key);
-  } else {
-    if (!window.confirm(`「${e.plan.title}」を非表示にしますか？（「並び順・表示をリセット」で戻せます）`)) return;
-    if (!planView.hidden.includes(key)) planView.hidden.push(key);
-  }
-  savePlanView();
-  renderSchedule();
+/* 当日の調整方針（DATA.branches） */
+function renderSchedule() {
+  renderMasterPlan();
+  renderSchedEditorSection();
+  renderBackupPlans();
+  const box = $("#schedule-content"); if (!box) return;
+  box.innerHTML = `<div class="branch-grid">${DATA.branches.map(b =>
+    `<div class="branch ${esc(b.cls)}"><h4>${esc(b.title)}</h4><p>${esc(b.text)}</p></div>`).join("")}</div>`;
 }
 
-/* 保存プランを DATA.plans 用のオブジェクトとして書き出す（commitで全員に共有） */
-function exportUserPlanToData(id) {
-  const pl = userPlans.find(p => p.id === id); if (!pl) return;
-  const items = pl.items.map(([t, b, s]) => `    [${JSON.stringify(t)}, ${JSON.stringify(b)}, ${JSON.stringify(s || "")}]`).join(",\n");
-  const out = `{
-  title: ${JSON.stringify(pl.title)},
-  featured: false,
-  route: "",
-  items: [
-${items}
-  ]
-},`;
-  if (navigator.clipboard) navigator.clipboard.writeText(out).catch(() => {});
-  window.prompt("この内容を app.js の DATA.plans 配列に追加して commit すると、全員のプラン例に表示されます（クリップボードにもコピー済み）:", out);
-}
-
-/* ---- 保存プラン＆プラン例の表示状態（この端末に保存） ---- */
-const USERPLAN_KEY = "takayama-trip-userplans";
+/* ---- 予備プラン（共有）と表示状態（この端末に保存） ---- */
+const PLANS_KEY = "takayama-trip-plans";
+const PLANS_VERSION = 1;
 const PLANVIEW_KEY = "takayama-trip-planview";
-function loadUserPlans() {
-  try { const s = JSON.parse(localStorage.getItem(USERPLAN_KEY)); if (Array.isArray(s)) return s; } catch (e) {}
+function loadPlans() {
+  try { const s = JSON.parse(localStorage.getItem(PLANS_KEY)); if (s && Array.isArray(s.items)) return s.items; } catch (e) {}
   return [];
 }
-function saveUserPlans() { localStorage.setItem(USERPLAN_KEY, JSON.stringify(userPlans)); }
+function savePlans() { localStorage.setItem(PLANS_KEY, JSON.stringify({ v: PLANS_VERSION, items: plans })); fbPush("plans", plans); }
+/* 予備プランの並び順だけ端末に持つ（見る人ごとの表示状態。同期しない。追補H-9） */
 function loadPlanView() {
-  try { const s = JSON.parse(localStorage.getItem(PLANVIEW_KEY)); if (s && typeof s === "object") return { order: Array.isArray(s.order) ? s.order : [], hidden: Array.isArray(s.hidden) ? s.hidden : [] }; } catch (e) {}
-  return { order: [], hidden: [] };
+  try { const s = JSON.parse(localStorage.getItem(PLANVIEW_KEY)); if (s && typeof s === "object") return { order: Array.isArray(s.order) ? s.order : [] }; } catch (e) {}
+  return { order: [] };
 }
 function savePlanView() { localStorage.setItem(PLANVIEW_KEY, JSON.stringify(planView)); }
-let userPlans = loadUserPlans();
+let plans = loadPlans();
 let planView = loadPlanView();
-
-function addCurrentScheduleAsPlan() {
-  // 日別サブタブを開いているときはその日だけを、全体タブなら全日をプラン化する
-  const src = schedDayView === "all" ? schedule : schedule.filter(it => normalizeDay(it.day) === schedDayView);
-  if (!src.length) { window.alert("スケジュールが空です。先に予定を入れてください。"); return; }
-  const def = schedDayView === "all" ? ("保存プラン " + (userPlans.length + 1)) : dayLabel(schedDayView) + " のプラン";
-  const title = (window.prompt("プラン名を入力してください:", def) || "").trim();
-  if (!title) return;
-  const items = src.map(it => [it.time || "—", it.text || "", it.status === "confirmed" ? "確定" : "未確定"]);
-  const id = (userPlans.reduce((m, p) => Math.max(m, p.id || 0), 0) + 1);
-  userPlans.push({ id, title, items });
-  saveUserPlans();
-  renderSchedule();
-  window.alert(`「${title}」をプラン例に追加しました。`);
-}
 
 /* ---- 編集できるスケジュール（ドラッグ並び替え・時刻入力・確定切替・localStorage保存） ----
    ★共有の初期表示（A仕様）: 下の SCHED_DEFAULT が「全員に配られる初期スケジュール」。
@@ -2159,6 +2116,12 @@ function saveSchedule() { localStorage.setItem(SCHED_KEY, JSON.stringify({ v: SC
      （同行者の画面まで勝手に切り替わると事故になる。絞り込みと同じ方針） */
 let schedDayView = "all";
 
+/* 編集モード。null = 編集していない（＝編集セクションを描かない）。
+   ★「隠す」ではなく「描かない」。display:none にしても SortableJS は生きたままで、
+     スマホのスクロール中の誤タップで予定が入れ替わる事故が実際に起きていた。
+     端末ごとの状態なので保存しない（追補H-9）。 */
+let schedEditing = null;
+
 // 候補名から予定行を作る。地点カードに一致すれば ref を付け、確定状態を引き継ぐ。
 // day は「いま見ているサブタブの日」。全体タブから足したときは初日に入る。
 function schedItemFromName(name, day) {
@@ -2233,6 +2196,105 @@ function schedRowHtml(it, i) {
         </span>
         <input class="sched-text" type="text" value="${esc(it.text || "")}" data-i="${i}" placeholder="予定を入力" aria-label="予定">
       </li>`;
+}
+
+/* ===== 編集セクションの組み立て・撤去 =====
+   ★編集モードでないときは DOM ごと作らない。隠すだけでは SortableJS が生き残り、
+     スマホのスクロール中の誤タップで予定が入れ替わる（実際に頻発していた）。 */
+function openSchedEditor(day) {
+  schedEditing = day || "all";
+  schedDayView = schedEditing;
+  renderMasterPlan();          // 編集中の日を示すため描き直す
+  renderSchedEditorSection();
+  const host = $("#sched-editor-host");
+  if (host && host.scrollIntoView) host.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+function closeSchedEditor() {
+  schedEditing = null;
+  schedDayView = "all";        // 次に開いたとき前回の日が残らないようにする
+  renderSchedEditorSection();  // ここで DOM ごと消える＝Sortable も一緒に捨てられる
+  renderMasterPlan();
+  renderBackupPlans();
+}
+function renderSchedEditorSection() {
+  const host = $("#sched-editor-host"); if (!host) return;
+  if (!schedEditing) {
+    // ★空にすると、Sortable が握っていた要素ごと GC される。フラグも戻す
+    host.innerHTML = "";
+    schedSortInit = false;
+    return;
+  }
+  host.innerHTML = `
+    <div class="sched-editor is-editing">
+      <div class="sched-edit-head">
+        <h3 class="sched-subhead">編集中${schedEditing === "all" ? "（全体）" : `（${esc(dayLabel(schedEditing))}）`}</h3>
+        <button class="btn-primary" id="sched-done">編集を終える</button>
+      </div>
+      <p class="sched-hint muted">変更は<strong>入力した時点で同行者にも反映</strong>されます（保存ボタンはありません）。「編集を終える」で読みやすい表示に戻ります。</p>
+      <div class="sched-legend">
+        <span class="st-chip confirmed">確定</span><span>タップで未確定に切り替わります</span>
+        <span class="st-chip tentative">未確定</span><span>地点に紐づく行（📍）はカード・マップとも連動します</span>
+      </div>
+      <div class="sched-day-tabs" id="sched-day-tabs" aria-label="日の切替"></div>
+      <div class="sched-cols">
+        <div class="sched-col">
+          <h4 class="sched-col-h">タイムスケジュール <span class="muted">ドラッグ並び替え・時刻入力・確定切替</span></h4>
+          <ol class="sched-list" id="sched-list"></ol>
+          <div class="sched-toolbar">
+            <select id="sched-add-place" class="sched-select"><option value="">＋ 候補から追加…</option></select>
+            <button class="btn-ghost" id="sched-add-row">＋ 空の行</button>
+            <button class="btn-ghost" id="sched-reset">おすすめ順に戻す</button>
+            <button class="btn-ghost" id="sched-clear">空にする</button>
+          </div>
+          <p class="sched-hint muted">「全体」では日付の見出し行を挟んで5日ぶんを通しで表示します。<strong>行を別の日の見出しの下へドラッグすると、その予定の日付が切り替わります。</strong>「＋ 空の行」「おすすめ順に戻す」「空にする」は、日別タブを開いているときはその日だけに効きます。</p>
+        </div>
+        <div class="sched-col">
+          <h4 class="sched-col-h">候補リスト <span class="muted">ドラッグ or ⊕ で左へ追加</span></h4>
+          <div class="sched-cand-tabs" id="sched-cand-tabs">
+            <button class="sched-cand-tab active" data-filter="all">すべて</button>
+            <button class="sched-cand-tab" data-filter="spots">🌿 スポット</button>
+            <button class="sched-cand-tab" data-filter="restaurants">🍽 レストラン</button>
+            <button class="sched-cand-tab" data-filter="cafes">☕ カフェ</button>
+          </div>
+          <ul class="sched-cand-list" id="sched-candidates"></ul>
+        </div>
+      </div>
+    </div>`;
+  // 中身を作ってから配線する（毎回作り直すので addEventListener の重複は起きない）
+  renderSchedDayTabs();
+  renderScheduleEditor();
+  renderSchedCandidates();
+  setupSchedCandTabs();
+  populateSchedAddSelect();
+  schedSortInit = false;       // 新しい DOM に対して張り直す
+  setupScheduleSortable();
+  wireSchedToolbar();
+  $("#sched-done").addEventListener("click", closeSchedEditor);
+}
+
+/* 編集セクションのツールバー。★日別タブを開いているときはその日だけに効く（追補K-4） */
+function wireSchedToolbar() {
+  $("#sched-add-row").addEventListener("click", () => {
+    const day = schedDayView === "all" ? FIRST_DAY : schedDayView;
+    insertSchedItem({ day, time: "", text: "", status: "tentative" });
+  });
+  $("#sched-reset").addEventListener("click", () => {
+    if (schedDayView === "all") {
+      schedule = SCHED_DEFAULT.map(x => ({ ...x }));
+    } else {
+      const others = schedule.filter(it => normalizeDay(it.day) !== schedDayView);
+      const restored = SCHED_DEFAULT.filter(x => x.day === schedDayView).map(x => ({ ...x }));
+      // 元の日付順を保つため、日付キーで並べ直す
+      schedule = others.concat(restored).sort((a, b) => DAY_KEYS.indexOf(normalizeDay(a.day)) - DAY_KEYS.indexOf(normalizeDay(b.day)));
+    }
+    saveSchedule(); syncRouteFromSchedule(); renderScheduleEditor(); renderMasterPlan();
+  });
+  $("#sched-clear").addEventListener("click", () => {
+    const what = schedDayView === "all" ? "すべての予定" : `${dayLabel(schedDayView)}の予定`;
+    if (!confirm(`${what}を消しますか？（同行者の端末にも反映されます）`)) return;
+    schedule = schedDayView === "all" ? [] : schedule.filter(it => normalizeDay(it.day) !== schedDayView);
+    saveSchedule(); syncRouteFromSchedule(); renderScheduleEditor(); renderMasterPlan();
+  });
 }
 
 function renderScheduleEditor() {
@@ -3113,6 +3175,9 @@ function applyRemote(d) {
   if (Array.isArray(d.info) && JSON.stringify(d.info) !== JSON.stringify(infoItems)) {
     infoItems = d.info; localStorage.setItem(INFO_KEY, JSON.stringify({ v: INFO_VERSION, items: infoItems })); changed = true;
   }
+  if (Array.isArray(d.plans) && JSON.stringify(d.plans) !== JSON.stringify(plans)) {
+    plans = d.plans; localStorage.setItem(PLANS_KEY, JSON.stringify({ v: PLANS_VERSION, items: plans })); changed = true;
+  }
   applyingRemote = false;
   if (changed) rerenderAll();
 }
@@ -3120,9 +3185,15 @@ function applyRemote(d) {
 function rerenderAll() {
   renderAllCards();
   if ($("#info-content")) renderInfo();
-  if (typeof renderSchedule === "function") renderSchedule();
-  if ($("#sched-day-tabs")) renderSchedDayTabs();
-  if ($("#sched-list")) renderScheduleEditor();
+  // renderSchedule() が本命・編集セクション・予備プランをまとめて描き直す。
+  // ★編集中に他端末の変更が届いても、編集セクションは作り直さない
+  //   （入力中のカーソルとIME変換が飛ぶため）。本命と予備だけ更新する。
+  if ($("#master-plan")) {
+    renderMasterPlan();
+    renderBackupPlans();
+    if (schedEditing) { renderSchedDayTabs(); renderScheduleEditor(); }
+    else renderSchedule();
+  }
   if ($("#route-list")) renderRouteEditor();
   if (typeof map !== "undefined" && map) { refreshMarkers(); drawRouteLine(); applyFilters(); }
 }
@@ -3136,14 +3207,24 @@ window.startFirebaseSync = async function () {
     const d = snap.val();
     // コード側の初期バージョンが新しい（SCHED_DEFAULT/STATUS_DEFAULT を更新した）ら、
     // DB を現在のコードの初期値で作り直す（＝全員に配る初期表示の更新）。
+    // ★★ここに新しいキーのバージョン条件を足してはいけない。★★
+    //    FB.set(tripRef, …) は「ノード全体」を置き換えるので、
+    //    たとえば plans を配るために条件を足すと、schedule も巻き添えで初期値に戻り、
+    //    ブラウザで編集した旅程が消える。新しいキーは必ず下のように単独で用意する。
     if (!d || (d.schedVersion || 0) < SCHED_VERSION || (d.statusVersion || 0) < STATUS_VERSION
            || (d.infoVersion || 0) < INFO_VERSION) {
       await window.FB.set(tripRef, JSON.parse(JSON.stringify({
         schedule, schedVersion: SCHED_VERSION,
         status: statusToArray(), statusVersion: STATUS_VERSION,
         route: routeIds,
-        info: infoItems, infoVersion: INFO_VERSION
+        info: infoItems, infoVersion: INFO_VERSION,
+        plans, plansVersion: PLANS_VERSION
       })));
+    } else if (!Array.isArray(d.plans)) {
+      // 予備プランはあとから足したキー。既存のDBには無いので、ここだけ単独で用意する
+      // （上の一括リセットには絶対に混ぜない）
+      fbPush("plans", plans);
+      fbPush("plansVersion", PLANS_VERSION);
     }
     window.FB.onValue(tripRef, s => applyRemote(s.val()));
     console.log("Firebase 同期を開始しました");
@@ -3154,13 +3235,9 @@ function init() {
   // ★最初に呼ぶ。setupMap() はマップタブを開くまで走らないが、下の renderRouteEditor() が
   //   currentFilters() 経由でルート列の .checked を読むため、ここで無いとページ全体が落ちる。
   renderMapFilters();
+  // ★スケジュールタブは「本命プラン（読む）＋ 予備プラン」。編集セクションは
+  //   renderSchedule() の中で schedEditing を見て作られる（既定は作られない＝誤タップ防止）
   renderSchedule();
-  renderSchedDayTabs();      // 全体／8/8〜8/12 のサブタブ（★4泊5日対応）
-  renderScheduleEditor();
-  renderSchedCandidates();
-  setupSchedCandTabs();
-  populateSchedAddSelect();
-  setupScheduleSortable();
   renderAllCards();   // スポット＋（絞り込み・並び替え付きの）レストラン／カフェ
   renderRoutes();
   renderPacking();
@@ -3186,32 +3263,6 @@ function init() {
   // ルート編集ボタン
   $("#route-reset").addEventListener("click", () => { routeIds = DEFAULT_ROUTE.slice(); syncRoute(); });
   $("#route-clear").addEventListener("click", () => { routeIds = []; syncRoute(); });
-
-  // スケジュール編集ボタン
-  // ★日別サブタブを開いているときは、その日だけに効く（全体タブなら全日が対象）
-  $("#sched-add-row").addEventListener("click", () => {
-    const day = schedDayView === "all" ? FIRST_DAY : schedDayView;
-    insertSchedItem({ day, time: "", text: "", status: "tentative" });
-  });
-  $("#sched-reset").addEventListener("click", () => {
-    if (schedDayView === "all") {
-      schedule = SCHED_DEFAULT.map(x => ({ ...x }));
-    } else {
-      const others = schedule.filter(it => normalizeDay(it.day) !== schedDayView);
-      const restored = SCHED_DEFAULT.filter(x => x.day === schedDayView).map(x => ({ ...x }));
-      // 元の日付順を保つため、日付キーで並べ直す
-      schedule = others.concat(restored).sort((a, b) => DAY_KEYS.indexOf(normalizeDay(a.day)) - DAY_KEYS.indexOf(normalizeDay(b.day)));
-    }
-    saveSchedule(); syncRouteFromSchedule(); renderScheduleEditor();
-  });
-  $("#sched-clear").addEventListener("click", () => {
-    const what = schedDayView === "all" ? "すべての予定" : `${dayLabel(schedDayView)}の予定`;
-    if (!confirm(`${what}を消しますか？（同行者の端末にも反映されます）`)) return;
-    schedule = schedDayView === "all" ? [] : schedule.filter(it => normalizeDay(it.day) !== schedDayView);
-    saveSchedule(); syncRouteFromSchedule(); renderScheduleEditor();
-  });
-  $("#sched-save-plan").addEventListener("click", addCurrentScheduleAsPlan);
-  $("#sched-export").addEventListener("click", exportSchedule);
 
   // 注意タブの編集モード（誤タップ防止：既定は閲覧モード）
   $("#info-edit-toggle").addEventListener("click", () => { infoEditing = !infoEditing; renderInfo(); });
