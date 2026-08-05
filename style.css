@@ -182,14 +182,20 @@ a { color: var(--ai); }
 .tl-end { display: block; font-weight: 400; font-size: .78rem; color: var(--muted); }
 /* 予定行から地点カードへのリンク */
 /* 予定行に紐づいた地点。★本文からは読み取れないことが多いので必ず名前を出す
-   （例:「彦根 到着見込み」→ 彦根城）。この ref がマップのピン順を決めている */
-.tl-place {
-  display: inline-flex; align-items: center; gap: .25rem; margin-top: .25rem;
+   （例:「彦根 到着見込み」→ 彦根城）。この ref がマップのピン順を決めている。
+   ★行き先が2つあるので、1つのピルを区切って並べる。
+     別々のチップにすると無関係な2つに見え、くっつけると押し分けられない。 */
+.tl-links { display: inline-flex; align-items: stretch; margin-top: .25rem; max-width: 100%; }
+.tl-place, .tl-maps {
+  display: inline-flex; align-items: center; gap: .25rem;
   font-size: .78rem; color: var(--ai); background: var(--kinari-2);
-  border: 1px solid var(--line); border-radius: 999px; padding: .1rem .5rem;
-  text-decoration: none; max-width: 100%;
+  border: 1px solid var(--line); text-decoration: none;
 }
-.tl-place:hover { border-color: var(--ai-2); color: var(--shu); }
+.tl-place { border-radius: 999px 0 0 999px; padding: .1rem .5rem; border-right: none; min-width: 0; }
+/* ★指で押し分けられる幅を確保する。狭いと地点名を押すつもりで地図が開く */
+.tl-maps { border-radius: 0 999px 999px 0; padding: .1rem .6rem; min-width: 40px; justify-content: center; }
+.tl-place:hover { color: var(--shu); }
+.tl-maps:hover { background: var(--shu); border-color: var(--shu); }
 .timeline .st-chip { margin-left: .4rem; vertical-align: 1px; }
 
 .backup-plan { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); margin-bottom: .6rem; }

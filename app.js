@@ -1844,9 +1844,18 @@ function scheduleRowReadHtml(it) {
      （例:「彦根 到着見込み」→ 彦根城 / 「八尾を出発」→ 近鉄八尾駅）。
      この ref がマップのピン順を決めているので、見えないと確認できない。
      リンクは地点チップだけにする（本文にも張ると1行にリンクが2つになる）。 */
+  /* 地点チップは行き先が2つある。押し分けられるよう1つのピルを区切って並べる。
+     ・地点名 → その地点のカード（写真・営業時間・点数・犬の条件）
+     ・🗺    → Googleマップのその場所のページ（ナビはユーザーがそこで開始する）
+     URLは placeMapsUrl() を使い回す（カードの「📍 Googleマップ」やマップのピンと同じもの）。 */
   const p = it.ref ? getPlaceById(it.ref) : null;
   const place = p
-    ? `<a class="tl-place" href="#" data-goto-ref="${esc(it.ref)}">${TYPE_ICONS[p.type] || "📍"} ${esc(p.name)}</a>`
+    ? `<span class="tl-links">
+        <a class="tl-place" href="#" data-goto-ref="${esc(it.ref)}"
+           title="${esc(p.name)}のカードを見る">${TYPE_ICONS[p.type] || "📍"} ${esc(p.name)}</a>
+        <a class="tl-maps" href="${placeMapsUrl(p)}" target="_blank" rel="noopener"
+           title="Googleマップで開く" aria-label="${esc(p.name)}をGoogleマップで開く">🗺</a>
+      </span>`
     : "";
   return `<li>
       <span class="tl-time">${when}</span>
