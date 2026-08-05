@@ -196,6 +196,8 @@ a { color: var(--ai); }
 .sched-editor.is-editing { border: 2px solid var(--ai-2); }
 .sched-edit-head { display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; }
 .sched-edit-head .sched-subhead { margin: 0; flex: 1; min-width: 0; }
+/* 編集セクションは縦に長いので出口を末尾にも置く（先頭のボタンが画面外に出るため） */
+.sched-edit-foot { margin-top: .9rem; padding-top: .8rem; border-top: 1px solid var(--line); text-align: right; }
 .btn-primary { background: var(--ai-2); color: #fff; border: 1px solid var(--ai-2); border-radius: 999px; padding: .35rem .9rem; font: inherit; font-size: .84rem; font-weight: 700; cursor: pointer; }
 .btn-primary:hover { background: var(--ai); }
 

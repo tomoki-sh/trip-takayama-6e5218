@@ -1869,6 +1869,14 @@ function scheduleCardsHtml(rows, opts = {}) {
 /* ---- 本命プラン（= schedule そのもの） ---- */
 function renderMasterPlan() {
   const box = $("#master-plan"); if (!box) return;
+  /* ★編集モード中は出さない。理由は2つある。
+     ・編集セクションの入力ハンドラは saveSchedule() しか呼ばない（カーソルとIME変換を
+       飛ばさないため、入力のたびに再描画しない）。出したままだと本命の表示だけが取り残され、
+       他端末は applyRemote で更新されるのに「編集している本人だけが古い表示を見る」ことになる
+     ・隠せば、編集の操作を足すたびに renderMasterPlan() を呼ぶことを覚えておかずに済む（0-3）
+     見る人ごとの表示状態なので、同行者の画面は隠れない（追補H-9）。
+     隠すことで「編集を終える」がタブの先頭に来るので、編集モードの出口も分かりやすくなる。 */
+  if (schedEditing) { box.innerHTML = ""; return; }
   box.innerHTML = `
     <div class="plan-section-head">
       <h3 class="sched-subhead">本命プラン</h3>
@@ -2228,7 +2236,7 @@ function renderSchedEditorSection() {
     <div class="sched-editor is-editing">
       <div class="sched-edit-head">
         <h3 class="sched-subhead">編集中${schedEditing === "all" ? "（全体）" : `（${esc(dayLabel(schedEditing))}）`}</h3>
-        <button class="btn-primary" id="sched-done">編集を終える</button>
+        <button class="btn-primary sched-done">編集を終える</button>
       </div>
       <p class="sched-hint muted">変更は<strong>入力した時点で同行者にも反映</strong>されます（保存ボタンはありません）。「編集を終える」で読みやすい表示に戻ります。</p>
       <div class="sched-legend">
@@ -2259,6 +2267,9 @@ function renderSchedEditorSection() {
           <ul class="sched-cand-list" id="sched-candidates"></ul>
         </div>
       </div>
+      <div class="sched-edit-foot">
+        <button class="btn-primary sched-done">編集を終える</button>
+      </div>
     </div>`;
   // 中身を作ってから配線する（毎回作り直すので addEventListener の重複は起きない）
   renderSchedDayTabs();
@@ -2269,7 +2280,8 @@ function renderSchedEditorSection() {
   schedSortInit = false;       // 新しい DOM に対して張り直す
   setupScheduleSortable();
   wireSchedToolbar();
-  $("#sched-done").addEventListener("click", closeSchedEditor);
+  // 編集セクションは縦に長いので、出口は先頭と末尾の2か所に置く
+  $$(".sched-done").forEach(b => b.addEventListener("click", closeSchedEditor));
 }
 
 /* 編集セクションのツールバー。★日別タブを開いているときはその日だけに効く（追補K-4） */
