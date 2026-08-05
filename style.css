@@ -576,29 +576,17 @@ a { color: var(--ai); }
    ★.btn-gmaps の規則はこのブロックにまとめる。離れた行に書くと今回の取り違えが起きる。 */
 .btn-gmaps.too-many { background: var(--shu); border-color: var(--shu); color: #fff; }
 .btn-gmaps.too-many:hover { background: #a63822; }
-.route-cols { display: grid; grid-template-columns: 1fr; gap: 1rem; }
-.route-col h4 { margin: 0 0 .4rem; font-size: .92rem; color: var(--ai); }
-.route-list, .candidates-list { list-style: none; margin: 0; padding: 0; min-height: 48px; display: flex; flex-direction: column; gap: .35rem; }
-.route-list { counter-reset: r; }
-.route-item, .cand-item {
+/* 回る順番。★閲覧専用（スケジュールから作られる導出値なので、ここでは編集させない） */
+.route-note { font-size: .8rem; margin: 0 0 .6rem; }
+.route-list { list-style: none; margin: 0; padding: 0; min-height: 48px; display: flex; flex-direction: column; gap: .35rem; counter-reset: r; }
+.route-item {
   display: flex; align-items: center; gap: .5rem; background: var(--kinari);
   border: 1px solid var(--line); border-radius: 10px; padding: .45rem .6rem; font-size: .86rem;
 }
-.route-item { cursor: grab; }
 .route-item .num { counter-increment: r; }
 .route-item .num::before { content: counter(r); background: var(--cyan); color: #fff; font-size: .72rem; font-weight: 700; width: 20px; height: 20px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; }
-.route-item .type-emoji, .cand-item .type-emoji { font-size: 1rem; }
-.route-item .nm, .cand-item .nm { flex: 1; }
-.route-item .rm, .cand-item .add {
-  border: none; background: none; cursor: pointer; font-size: 1rem; line-height: 1;
-  width: 26px; height: 26px; border-radius: 50%;
-}
-.route-item .rm { color: var(--shu); }
-.route-item .rm:hover { background: #fbe3df; }
-.cand-item { cursor: grab; }
-.cand-item .add { color: var(--cyan); }
-.cand-item .add:hover { background: #def0f0; }
-.cand-item.in-route { opacity: .45; }
+.route-item .type-emoji { font-size: 1rem; }
+.route-item .nm { flex: 1; }
 .route-empty { color: var(--muted); font-size: .84rem; padding: .5rem; }
 .sortable-ghost { opacity: .4; }
 .sortable-chosen { box-shadow: 0 0 0 2px var(--cyan); }
@@ -707,7 +695,6 @@ a { color: var(--ai); }
 @media (min-width: 640px) {
   .cards { grid-template-columns: 1fr 1fr; }
   .branch-grid { grid-template-columns: 1fr 1fr; }
-  .route-cols { grid-template-columns: 1fr 1fr; }
   .hero-title { font-size: 2.9rem; }
 }
 @media (min-width: 920px) {

@@ -1552,7 +1552,8 @@ const MAP_FILTER_COLUMNS = [
   { group: "dog",    label: "犬",
     chips: () => groupsPresentIn(allPlaces(), "dog").map(([k, l]) => [k, l]) },
   { group: "status", label: "状態",   chips: () => STATUS_GROUPS },
-  { group: "route",  label: "ルート", chips: () => [["route-only", "ルート内のみ"]], off: true },
+  // 「ルート内」＝スケジュールの予定に紐づいている地点。ラベルは実態に合わせる
+  { group: "route",  label: "予定", chips: () => [["route-only", "🗓 予定に入っている地点だけ"]], off: true },
 ];
 // sets[列ID] が未設定 = 未初期化（初回に全選択にする）
 // open: 一覧表の開閉。★localStorage にも Firebase にも保存しない（見る人ごとの表示状態。追補H-9）
@@ -1785,7 +1786,7 @@ function linkPills(p) {
     const icon = /食べログ/.test(l.label) ? "🍴" : "🔗";
     pills.push(`<a class="${cls}" href="${esc(l.url)}" target="_blank" rel="noopener">${icon} ${esc(l.label)}</a>`);
   });
-  pills.push(`<button class="pill add-route" data-add="${esc(placeId(p.type, p.name))}">＋ ルートに追加</button>`);
+  pills.push(`<button class="pill add-sched" data-add-sched="${esc(placeId(p.type, p.name))}">＋ スケジュールに追加</button>`);
   return `<div class="card-links">${pills.join("")}</div>`;
 }
 function renderCard(p) {
@@ -2151,13 +2152,17 @@ function schedItemFromName(name, day) {
 }
 // スケジュールの地点項目（ref）の並び順を、マップのルートに反映する（片方向連動）
 // ★全日ぶんをまとめて1本のルートにする。日ごとの絞り込みはマップの「日」フィルタで行う。
-function syncRouteFromSchedule() {
-  const seen = new Set(), ordered = [];
+/* スケジュールの並び順から作るルート（副作用なし）。★routeIds の唯一の作り手。 */
+function routeFromSchedule() {
+  const seen = new Set(), out = [];
   schedule.forEach(it => {
-    if (it.ref && getPlaceById(it.ref) && !seen.has(it.ref)) { seen.add(it.ref); ordered.push(it.ref); }
+    if (it.ref && getPlaceById(it.ref) && !seen.has(it.ref)) { seen.add(it.ref); out.push(it.ref); }
   });
-  routeIds = ordered;
-  saveRoute();
+  return out;
+}
+/* スケジュールを編集したあとに呼ぶ。保存はしない（導出値なので） */
+function syncRouteFromSchedule() {
+  routeIds = routeFromSchedule();
   if ($("#route-list")) renderRouteEditor();
   if (typeof map !== "undefined" && map) { refreshMarkers(); drawRouteLine(); applyFilters(); }
 }
@@ -2811,34 +2816,14 @@ function setupLightbox() {
 /* =========================================================================
    ルート状態（localStorage）
    ========================================================================= */
-const ROUTE_KEY = "takayama-trip-route";
-const DEFAULT_ROUTE = [
-  "spot:近鉄八尾駅（出発・帰着の目安）",
-  "spot:多賀SA（上り・ドッグラン）",
-  "spot:長良川SA（下り・ドッグラン）",
-  "spot:サンクチュアリコート高山（拠点）",
-  "spot:飛騨の里",
-  "restaurant:お食事処 大喜",
-  "spot:JA産直市場 アグリ高山",
-  "spot:光ミュージアム",
-  "restaurant:coffee & kitchen ぼくんち",
-  "spot:飛騨大鍾乳洞",
-  "restaurant:自然薯 茶茶 じねんのむら 飛騨高山店",
-  "spot:山田春慶店",
-  "spot:関SA（上り・ドッグラン）",
-  "spot:彦根城（8/12の目的地の目安）"
-];
-let routeIds = loadRoute();
-function loadRoute() {
-  try {
-    const s = JSON.parse(localStorage.getItem(ROUTE_KEY));
-    if (Array.isArray(s)) return s.filter(getPlaceById);
-  } catch (e) {}
-  return DEFAULT_ROUTE.slice();
-}
-function saveRoute() { localStorage.setItem(ROUTE_KEY, JSON.stringify(routeIds)); fbPush("route", routeIds); }
-function addToRoute(id) { if (!routeIds.includes(id)) { routeIds.push(id); syncRoute(); } }
-function removeFromRoute(id) { routeIds = routeIds.filter(x => x !== id); syncRoute(); }
+/* ★ルートは「状態」ではなく「スケジュールから毎回作る値」。
+   保存も Firebase 同期もしない。書き換えるのは routeFromSchedule() の結果だけ。
+
+   かつては手で並べ替え・追加・削除ができたが、スケジュールを編集するたびに
+   syncRouteFromSchedule() が丸ごと作り直すため、手動の編集は黙って消えていた
+   （リロードだけでも消えた）。「編集できる見た目」のほうを無くして矛盾を解消した。
+   順番を変えたいときはスケジュールタブで編集する（追補F）。 */
+let routeIds = routeFromSchedule();
 function routeIndex(id) { return routeIds.indexOf(id); }
 
 /* =========================================================================
@@ -2868,7 +2853,7 @@ function popupHtml(p, id) {
     <div class="p-area">📍 ${esc(p.area)}</div>
     <p class="p-desc">${esc(p.desc)}</p>
     <div class="p-actions">
-      <button class="p-btn add" data-add="${esc(id)}">＋ルートに追加</button>
+      <button class="p-btn add" data-add-sched="${esc(id)}">＋ スケジュールに追加</button>
       <a class="p-btn maps" href="${placeMapsUrl(p)}" target="_blank" rel="noopener">📍マップ</a>
     </div>
   </div>`;
@@ -2932,8 +2917,8 @@ function visibleRouteIds() {
     if (seen.has(it.ref)) return;
     seen.add(it.ref); out.push(it.ref);
   });
-  // スケジュールに無いのに手でルートへ足した地点は、日で隠さず末尾に残す
-  routeIds.forEach(id => { if (!seen.has(id) && daysOfPlace(id).size === 0) { seen.add(id); out.push(id); } });
+  // ★かつては「手でルートへ足した、どの日にも属さない地点」を末尾に足していたが、
+  //   ルートがスケジュールの導出値になったので、そういう地点は存在しなくなった
   return out;
 }
 function applyFilters() {
@@ -3016,8 +3001,8 @@ function setupMap() {
 
   // ポップアップ内「追加」
   map.on("popupopen", (e) => {
-    const btn = e.popup._contentNode.querySelector("[data-add]");
-    if (btn) btn.addEventListener("click", () => { addToRoute(btn.dataset.add); map.closePopup(); });
+    const btn = e.popup._contentNode.querySelector("[data-add-sched]");
+    if (btn) btn.addEventListener("click", () => { map.closePopup(); addPlaceToSchedule(btn.dataset.addSched); });
   });
 }
 
@@ -3027,7 +3012,7 @@ function setupMap() {
 function renderRouteEditor() {
   const list = $("#route-list");
   if (!routeIds.length) {
-    list.innerHTML = `<li class="route-empty">ルートが空です。候補から追加してください。</li>`;
+    list.innerHTML = `<li class="route-empty">スケジュールに地点が紐づいていません。スケジュールタブで予定に地点を紐づけると、ここに順番が出ます。</li>`;
   } else {
     list.innerHTML = routeIds.map(id => {
       const p = getPlaceById(id); if (!p) return "";
@@ -3035,24 +3020,10 @@ function renderRouteEditor() {
         <span class="num"></span>
         <span class="type-emoji">${TYPE_ICONS[p.type]}</span>
         <span class="nm">${esc(p.name)}</span>
-        <button class="rm" data-rm="${esc(id)}" aria-label="削除">✕</button>
       </li>`;
     }).join("");
   }
-  const cand = $("#candidates-list");
-  cand.innerHTML = allPlaces().map(p => {
-    const id = placeId(p.type, p.name);
-    const inRoute = routeIndex(id) >= 0;
-    return `<li class="cand-item ${inRoute ? "in-route" : ""}" data-id="${esc(id)}">
-      <span class="type-emoji">${TYPE_ICONS[p.type]}</span>
-      <span class="nm">${esc(p.name)}</span>
-      <button class="add" data-addcand="${esc(id)}" aria-label="追加">⊕</button>
-    </li>`;
-  }).join("");
-
-  $$("#route-list .rm").forEach(b => b.addEventListener("click", () => removeFromRoute(b.dataset.rm)));
-  $$("#candidates-list .add").forEach(b => b.addEventListener("click", () => addToRoute(b.dataset.addcand)));
-
+  // ★閲覧専用。並べ替え・追加・削除の手段は置かない（順番はスケジュールが決める）
   // Googleマップでルートを開くボタンのリンクを更新（空なら無効化）
   const g = $("#route-gmaps");
   if (g) {
@@ -3068,41 +3039,17 @@ function renderRouteEditor() {
   }
 }
 
-/* ルート全体の再同期 */
-function syncRoute() {
-  saveRoute();
-  renderRouteEditor();
-  refreshMarkers();
-  if (map) { drawRouteLine(); applyFilters(); }
-}
-
-/* ドラッグ&ドロップ（並び替え + 候補→ルート追加）。
-   コンテナに一度だけバインドすればよい（innerHTML差し替え後も有効）。 */
-let sortableInited = false;
-function setupSortableCross() {
-  if (sortableInited || typeof Sortable === "undefined") return;
-  sortableInited = true;
-  // ルートリスト: 並び替え可・候補からの受け入れ可
-  Sortable.create($("#route-list"), {
-    group: { name: "shared", pull: true, put: true },
-    animation: 150, ghostClass: "sortable-ghost", chosenClass: "sortable-chosen",
-    draggable: ".route-item",
-    onAdd: (evt) => {
-      const id = evt.item.dataset.id;
-      evt.item.remove();          // 落ちてきたクローンを除去（モデルから再描画）
-      addToRoute(id);             // syncRoute 内で再描画される
-    },
-    onUpdate: () => {
-      routeIds = $$("#route-list .route-item").map(li => li.dataset.id).filter(Boolean);
-      syncRoute();
-    }
-  });
-  // 候補リスト: クローンを引き出すだけ（並び替え・受け入れなし）
-  Sortable.create($("#candidates-list"), {
-    group: { name: "shared", pull: "clone", put: false },
-    sort: false, animation: 150,
-    draggable: ".cand-item"
-  });
+/* この地点をスケジュールに入れる（カード・特集タブ・マップのピンの「＋ スケジュールに追加」）。
+   ★ルートに直接足すのではなく、唯一の正本であるスケジュールに行を足す。
+     ルートはそこから自動で作られる。 */
+function addPlaceToSchedule(id) {
+  const p = getPlaceById(id); if (!p) return;
+  // 編集中ならその日、そうでなければ初日の末尾へ。どこに入るかを先に伝える
+  const day = (schedEditing && schedEditing !== "all") ? schedEditing : FIRST_DAY;
+  if (!window.confirm(`「${p.name}」をスケジュールに追加します。\n`
+    + `${dayLabel(day)}の末尾に、時刻なしで入ります。\n\n同行者の画面にも反映されます。`)) return;
+  insertSchedItem(schedItemFromName(p.name, day));
+  renderMasterPlan();   // insertSchedItem は編集セクションしか描き直さない
 }
 
 /* =========================================================================
@@ -3193,7 +3140,7 @@ function setupTabs() {
       const name = tab.dataset.tab;
       $("#panel-" + name).classList.add("active");
       if (name === "map") {
-        if (!mapReady) { setupMap(); setupSortableCross(); mapReady = true; }
+        if (!mapReady) { setupMap(); mapReady = true; }
         setTimeout(() => map && map.invalidateSize(), 60);
       }
       if (name === "weather" && !weatherLoaded) { loadWeather(); weatherLoaded = true; }
@@ -3243,9 +3190,7 @@ function applyRemote(d) {
       statusMap = merged; localStorage.setItem(STATUS_KEY, JSON.stringify({ v: STATUS_VERSION, map: statusMap })); changed = true;
     }
   }
-  if (d.route && JSON.stringify(d.route) !== JSON.stringify(routeIds)) {
-    routeIds = d.route; localStorage.setItem(ROUTE_KEY, JSON.stringify(routeIds)); changed = true;
-  }
+  // ★route は同期しない。スケジュールから作る導出値なので、受信側で作り直す（rerenderAll の先頭）
   if (Array.isArray(d.info) && JSON.stringify(d.info) !== JSON.stringify(infoItems)) {
     infoItems = d.info; localStorage.setItem(INFO_KEY, JSON.stringify({ v: INFO_VERSION, items: infoItems })); changed = true;
   }
@@ -3257,6 +3202,11 @@ function applyRemote(d) {
 }
 // status/並び順/ルートに依存する全ビューを再描画
 function rerenderAll() {
+  /* ★ルートを作り直す。これが無いと「同行者がスケジュールを編集しても、
+     こちらの地図のピン順が古いまま」になる。
+     以前は route も Firebase で送られてきたので揃っていたが、同期をやめたぶん
+     受信側で作り直す必要がある。自分の端末では正常に見えるので気づけない。 */
+  routeIds = routeFromSchedule();
   renderAllCards();
   if ($("#info-content")) renderInfo();
   // renderSchedule() が本命・編集セクション・予備プランをまとめて描き直す。
@@ -3290,7 +3240,6 @@ window.startFirebaseSync = async function () {
       await window.FB.set(tripRef, JSON.parse(JSON.stringify({
         schedule, schedVersion: SCHED_VERSION,
         status: statusToArray(), statusVersion: STATUS_VERSION,
-        route: routeIds,
         info: infoItems, infoVersion: INFO_VERSION,
         plans, plansVersion: PLANS_VERSION
       })));
@@ -3322,10 +3271,10 @@ function init() {
   setupLightbox();
   setupTabs();
 
-  // カード内「ルートに追加」
+  // カード・特集タブの「＋ スケジュールに追加」（ルートではなくスケジュールに足す）
   document.addEventListener("click", (e) => {
-    const b = e.target.closest("[data-add]");
-    if (b && b.classList.contains("add-route")) addToRoute(b.dataset.add);
+    const b = e.target.closest("[data-add-sched]");
+    if (b) addPlaceToSchedule(b.dataset.addSched);
   });
 
   // 確定／未確定バッジ（カード・スケジュール共通）: どこで押しても全タブに反映
@@ -3339,10 +3288,6 @@ function init() {
     const a = e.target.closest("[data-goto-ref]");
     if (a) { e.preventDefault(); gotoRefCard(a.dataset.gotoRef); }
   });
-
-  // ルート編集ボタン
-  $("#route-reset").addEventListener("click", () => { routeIds = DEFAULT_ROUTE.slice(); syncRoute(); });
-  $("#route-clear").addEventListener("click", () => { routeIds = []; syncRoute(); });
 
   // 注意タブの編集モード（誤タップ防止：既定は閲覧モード）
   $("#info-edit-toggle").addEventListener("click", () => { infoEditing = !infoEditing; renderInfo(); });
