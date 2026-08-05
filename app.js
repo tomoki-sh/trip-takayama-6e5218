@@ -1611,23 +1611,44 @@ const SPOT_SORTS = [
 const CARD_TABS = {
   spots: {
     target: "#cards-spots", tools: "#tools-spots", table: "#table-spots", type: "spot",
+    label: "スポット",
     filters: ["spot", "dog"], sorts: SPOT_SORTS, unit: "か所",
     empty: "条件に合う場所がありません。「すべて表示」で戻せます。",
     items: () => DATA.spots,
   },
   restaurants: {
     target: "#cards-restaurants", tools: "#tools-restaurants", table: "#table-restaurants", type: "restaurant",
+    label: "レストラン",
     filters: ["genre", "dog"], sorts: CARD_SORTS, unit: "店",
     empty: "条件に合う店がありません。「すべて表示」で戻せます。",
     items: () => DATA.restaurants,
   },
   cafes: {
     target: "#cards-cafes", tools: "#tools-cafes", table: "#table-cafes", type: "cafe",
+    label: "カフェ",
     filters: ["genre", "dog"], sorts: CARD_SORTS, unit: "店",
     empty: "条件に合う店がありません。「すべて表示」で戻せます。",
     items: () => DATA.cafes,
   },
 };
+
+/* ===== マップのフィルタ列 =====
+   ★値もラベルも、すべてここから作る。index.html には1つも書かない。
+     犬のラベルは DOG_GROUPS、日付は TRIP_DAYS が唯一の出どころなので、
+     旅行を差し替えるときに index.html を触る必要がない（0-1・追補K-5）。 */
+// 「状態」列。CAT_LABELS（確定/予備/要確認）はカードのバッジ用で語彙が違うので使わない
+const STATUS_GROUPS = [["confirmed", "確定"], ["tentative", "未確定"]];
+// off: true = 初期状態でチェックを入れない（「ルート内のみ」だけ）
+const MAP_FILTER_COLUMNS = [
+  { group: "day",    label: "日",
+    chips: () => TRIP_DAYS.map(d => [d.key, d.label.replace(/（.*?）/, "")]) },
+  { group: "type",   label: "種類",
+    chips: () => Object.values(CARD_TABS).map(t => [t.type, `${TYPE_ICONS[t.type]} ${t.label}`]) },
+  { group: "dog",    label: "犬",
+    chips: () => groupsPresentIn(allPlaces(), "dog").map(([k, l]) => [k, l]) },
+  { group: "status", label: "状態",   chips: () => STATUS_GROUPS },
+  { group: "route",  label: "ルート", chips: () => [["route-only", "ルート内のみ"]], off: true },
+];
 // sets[列ID] が未設定 = 未初期化（初回に全選択にする）
 // open: 一覧表の開閉。★localStorage にも Firebase にも保存しない（見る人ごとの表示状態。追補H-9）
 //       ただし renderCardTab() は絞り込み・確定トグル・Firebase受信のたびに走るので、
@@ -1671,13 +1692,15 @@ function viewedItems(key) {
   }).map(x => x.p);
 }
 
-/* その旅行に実在する区分だけを [キー, ラベル, 件数] で返す（0件の区分はチップを出さない） */
-function presentGroups(key, gid) {
-  const all = CARD_TABS[key].items();
+/* 渡した地点の中に実在する区分だけを [キー, ラベル, 件数] で返す（0件の区分はチップを出さない）。
+   ★カードは1タブぶん、マップは allPlaces()（全タブ）を渡す。絞り込みの語彙を二重に持たないため、
+     どちらもこの1本を通す。 */
+function groupsPresentIn(items, gid) {
   return FILTER_GROUPS[gid].groups
-    .map(([k, label]) => [k, label, all.filter(p => groupKeyOf(p, gid) === k).length])
+    .map(([k, label]) => [k, label, items.filter(p => groupKeyOf(p, gid) === k).length])
     .filter(x => x[2] > 0);
 }
+function presentGroups(key, gid) { return groupsPresentIn(CARD_TABS[key].items(), gid); }
 /* 全列を全選択に戻す（初期化と「すべて表示」で共用） */
 function resetCardFilters(key) {
   const v = cardView[key];
@@ -2714,18 +2737,52 @@ function popupHtml(p, id) {
     </div>
   </div>`;
 }
+/* マップのフィルタ列を描く。★中身は MAP_FILTER_COLUMNS だけが決める（index.html には書かない）。
+   呼ぶ場所に注意: setupMap() はマップタブを初めて開くまで走らないが、currentFilters() は
+   init() の renderRouteEditor() から即座に呼ばれる。ここで #map-filters が空だと
+   ルート列の .checked を読めずページ全体が落ちるので、init() の早い段階で呼ぶこと。 */
+function renderMapFilters() {
+  const el = $("#map-filters"); if (!el) return;
+  const rows = MAP_FILTER_COLUMNS.map(c => {
+    const chips = c.chips();
+    if (!chips.length) return "";   // その旅行に該当が無い列は丸ごと出さない
+    // ★チップは必ず .chip-row で包む。2列グリッドの右カラムに収まるので、
+    //   何行に折り返してもラベルの下に回り込まない（カード側と同じ理由）
+    return `<div class="filter-group" data-group="${esc(c.group)}">
+      <span class="filter-label">${esc(c.label)}</span>
+      <div class="chip-row">${chips.map(([v, l]) =>
+        `<label class="chip"><input type="checkbox" value="${esc(v)}"${c.off ? "" : " checked"}> ${esc(l)}</label>`
+      ).join("")}</div>
+    </div>`;
+  }).join("");
+  // 件数バッジ #map-filter-count は applyFilters() の書き込み先。消さないこと
+  el.innerHTML = `
+    <div class="tools-head">
+      <span class="tools-title">地図に出すピン</span>
+      <span class="muted map-filter-count" id="map-filter-count"></span>
+    </div>` + rows;
+}
 function currentFilters() {
   const get = g => $$(`.filter-group[data-group="${g}"] input:checked`).map(i => i.value);
   // ★「日」フィルタ（4泊5日対応）。閲覧者ごとのローカル操作なので同期しない。
   //   グループが無い場合（テスト等）は全日選択とみなす。
   const dayInputs = $$(`.filter-group[data-group="day"] input`);
   const days = dayInputs.length ? get("day") : DAY_KEYS.slice();
+  // 「犬」フィルタ。列が無ければ null＝素通し（犬連れでない旅行では列ごと外せる）
+  const dogInputs = $$(`.filter-group[data-group="dog"] input`);
+  const routeInput = $(`.filter-group[data-group="route"] input`);
   return { type: get("type"), status: get("status"),
-           routeOnly: $(`.filter-group[data-group="route"] input`).checked,
+           dog: dogInputs.length ? get("dog") : null,
+           routeOnly: !!(routeInput && routeInput.checked),
            days, dayFilterOn: dayInputs.length > 0 && days.length < DAY_KEYS.length };
 }
 /* いま表示対象になっている日の地点だけを、スケジュール順に並べて返す
-   （点線・Googleマップのナビはこれを使う） */
+   （点線・Googleマップのナビはこれを使う）
+
+   ★ここが見ているのは「日」だけ。種類・状態・犬で絞ってもルートは変わらない。
+     書き忘れではなく仕様。犬で絞ってナビの経由地が減ると、
+     「犬不可の場所を外したらルートが途中で切れた」という事故になるため。
+     日だけが例外なのは、Googleマップの経由地が9件までで5日ぶんを1本に渡せないから（追補K-5）。 */
 function visibleRouteIds() {
   const f = currentFilters();
   if (!f.dayFilterOn) return routeIds.slice();
@@ -2754,7 +2811,10 @@ function applyFilters() {
     const inRoute = routeIndex(id) >= 0;
     const pdays = daysOfPlace(id);
     const dayOk = !f.dayFilterOn || pdays.size === 0 || f.days.some(x => pdays.has(x));
-    const show = f.type.includes(p.type) && f.status.includes(getStatus(id)) && dayOk && (!f.routeOnly || inRoute);
+    // 犬の条件はカードと同じ groupKeyOf() で引く。dogKey の付け忘れは "other" になり
+    // どの区分にも入らないので静かに消える（test_cardtools.js が全件を検査している）
+    const dogOk = !f.dog || f.dog.includes(groupKeyOf(p, "dog"));
+    const show = f.type.includes(p.type) && f.status.includes(getStatus(id)) && dayOk && dogOk && (!f.routeOnly || inRoute);
     if (show) { shown++; if (!markerLayer.hasLayer(m)) m.addTo(markerLayer); }
     else { if (markerLayer.hasLayer(m)) markerLayer.removeLayer(m); }
   });
@@ -3091,6 +3151,9 @@ window.startFirebaseSync = async function () {
 };
 
 function init() {
+  // ★最初に呼ぶ。setupMap() はマップタブを開くまで走らないが、下の renderRouteEditor() が
+  //   currentFilters() 経由でルート列の .checked を読むため、ここで無いとページ全体が落ちる。
+  renderMapFilters();
   renderSchedule();
   renderSchedDayTabs();      // 全体／8/8〜8/12 のサブタブ（★4泊5日対応）
   renderScheduleEditor();
