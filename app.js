@@ -1868,11 +1868,17 @@ function scheduleRowReadHtml(it) {
 function scheduleCardsHtml(rows, opts = {}) {
   const groups = rowsByDay(rows);
   if (!groups.length) return `<p class="muted">予定がありません。</p>`;
+  const today = todayKey();
   return groups.map(g => {
     const edit = opts.editable
       ? `<button class="plan-edit" data-edit-day="${esc(g.day)}">編集</button>` : "";
-    return `<div class="plan-card featured" data-day="${esc(g.day)}">
+    /* ★「今日」は本命プランにだけ出す。予備プラン（過去の控え）に出すと
+         どれが今日の予定なのか分からなくなる。旅行期間外は today がどの日にも
+         一致しないので、何も起きない＝次の旅行にそのまま引き継げる。 */
+    const isToday = opts.editable && g.day === today;
+    return `<div class="plan-card featured${isToday ? " is-today" : ""}" data-day="${esc(g.day)}">
       <div class="plan-head"><h3>${esc(dayLabel(g.day))}</h3>
+        ${isToday ? `<span class="tag today">今日</span>` : ""}
         <span class="tag top">${g.rows.length}件</span>${edit}</div>
       ${daySub(g.day) ? `<p class="plan-route">${esc(daySub(g.day))}</p>` : ""}
       <ol class="timeline">${g.rows.map(scheduleRowReadHtml).join("")}</ol>
@@ -1900,15 +1906,21 @@ function renderMasterPlan() {
     <div class="plan-list-tools">
       <button class="btn-ghost" id="plan-edit-all">全体を編集</button>
       <button class="btn-ghost" id="plan-backup">予備プランへ書き出す</button>
-      <button class="btn-ghost" id="sched-export">共有用に書き出す</button>
     </div>`;
   $$("#master-plan .plan-edit").forEach(b =>
     b.addEventListener("click", () => openSchedEditor(b.dataset.editDay)));
   $("#plan-edit-all").addEventListener("click", () => openSchedEditor("all"));
   $("#plan-backup").addEventListener("click", exportScheduleAsBackup);
-  $("#sched-export").addEventListener("click", exportSchedule);
   // 地点チップ（.tl-place）のクリックは init() の委任で拾う。本命プランと予備プランの
   // 両方が同じ行の描画関数を使うので、描くたびに配線しない
+
+  /* 旅行中は今日のカードまで自動で送る。★初回だけ（上の todayScrolled の理由）。
+     scrollIntoView は jsdom に無いのでガードする。 */
+  if (!todayScrolled && DAY_KEYS.includes(todayKey())) {
+    todayScrolled = true;
+    const el = $("#master-plan .plan-card.is-today");
+    if (el && el.scrollIntoView) el.scrollIntoView({ block: "start" });
+  }
 }
 
 /* 予定行の ref から、その地点のカードタブへ移動して光らせる */
@@ -2062,6 +2074,18 @@ function dayLabel(key) { const d = TRIP_DAYS.find(x => x.key === key); return d 
 function daySub(key) { const d = TRIP_DAYS.find(x => x.key === key); return d ? d.sub : ""; }
 /* 不正・未設定の day は初日に寄せる（古い保存データや手編集への保険） */
 function normalizeDay(d) { return DAY_KEYS.includes(d) ? d : FIRST_DAY; }
+
+/* 端末のローカル日付を "YYYY-MM-DD" で返す（TRIP_DAYS の key と同じ形）。
+   ★toISOString() を使わないこと。UTCに変換されるため、日本時間の 0:00〜8:59 は
+     前日の日付になり、朝いちばんに開くと「今日」が昨日の予定を指す。 */
+function todayKey() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+/* 今日のカードへ自動スクロールしたか。★保存しない（見る人ごとの状態）。
+   rerenderAll() は同期を受け取るたびに走るので、初回だけにしないと
+   同行者が編集するたびに読んでいる場所が飛ぶ。 */
+let todayScrolled = false;
 
 // ref: 地点カードの placeId（"種別:名前"）。付けるとカード/マップと確定状態・並び順が連動する。
 const SCHED_DEFAULT = [
@@ -2271,6 +2295,7 @@ function renderSchedEditorSection() {
             <button class="btn-ghost" id="sched-add-row">＋ 空の行</button>
             <button class="btn-ghost" id="sched-reset">おすすめ順に戻す</button>
             <button class="btn-ghost" id="sched-clear">空にする</button>
+            <button class="btn-ghost" id="sched-export">開発者向け：初期表示を書き出す</button>
           </div>
           <p class="sched-hint muted">「全体」では日付の見出し行を挟んで5日ぶんを通しで表示します。<strong>行を別の日の見出しの下へドラッグすると、その予定の日付が切り替わります。</strong>「＋ 空の行」「おすすめ順に戻す」「空にする」は、日別タブを開いているときはその日だけに効きます。</p>
         </div>
@@ -2325,6 +2350,9 @@ function wireSchedToolbar() {
     schedule = schedDayView === "all" ? [] : schedule.filter(it => normalizeDay(it.day) !== schedDayView);
     saveSchedule(); syncRouteFromSchedule(); renderScheduleEditor(); renderMasterPlan();
   });
+  /* ★開発者向け。押すと SCHED_DEFAULT に貼るコードが prompt で出る。
+     同行者には意味が分からないので、読むモードには置かず編集セクションの中だけに出す。 */
+  $("#sched-export").addEventListener("click", exportSchedule);
 }
 
 function renderScheduleEditor() {
@@ -3056,6 +3084,11 @@ function addPlaceToSchedule(id) {
    天気（Open-Meteo, APIキー不要）
    ========================================================================= */
 const WX_ICONS = { 0:"☀️",1:"🌤",2:"⛅",3:"☁️",45:"🌫",48:"🌫",51:"🌦",53:"🌦",55:"🌧",61:"🌧",63:"🌧",65:"🌧",71:"🌨",80:"🌦",81:"🌧",82:"⛈",95:"⛈",96:"⛈",99:"⛈" };
+/* 天気を読み込み済みか。★成功したときだけ true にする。
+   失敗しても true にすると、電波の無い場所で一度開いただけで
+   「タブを開き直しても二度と再試行しない」状態になる（実際そうなっていた）。
+   setupTabs() のローカルではなくここに置くのは、成功判定が loadWeather() の中にあるため。 */
+let weatherLoaded = false;
 async function loadWeather() {
   const wp = DATA.weatherPoint;
   const url = `https://api.open-meteo.com/v1/forecast?latitude=${wp.lat}&longitude=${wp.lon}` +
@@ -3122,8 +3155,10 @@ async function loadWeather() {
     } else {
       alert.innerHTML = `<div class="alert-box ok">旅行期間（8/8〜8/12）はまだ7日予報の範囲外です。出発が近づいたら再確認を（このページを開くだけで自動更新されます）。</div>`;
     }
+    weatherLoaded = true;          // ★ここまで来たときだけ。catch では立てない
   } catch (e) {
-    box.innerHTML = `<p class="muted">天気情報を取得できませんでした（オフライン時など）。Open-Meteoに接続できる環境で再読み込みしてください。</p>`;
+    // 文言と挙動を一致させる。フラグを立てないので、次にタブを開けば自動で再試行する
+    box.innerHTML = `<p class="muted">天気情報を取得できませんでした（オフライン時など）。電波のある場所でこのタブを開き直すと、自動で再試行します。</p>`;
   }
 }
 
@@ -3131,7 +3166,7 @@ async function loadWeather() {
    タブ切替
    ========================================================================= */
 function setupTabs() {
-  let weatherLoaded = false, mapReady = false;
+  let mapReady = false;   // weatherLoaded は loadWeather() 側（成功時だけ立てる）
   $$("#tabs .tab").forEach(tab => {
     tab.addEventListener("click", () => {
       $$("#tabs .tab").forEach(t => t.classList.remove("active"));
@@ -3143,7 +3178,7 @@ function setupTabs() {
         if (!mapReady) { setupMap(); mapReady = true; }
         setTimeout(() => map && map.invalidateSize(), 60);
       }
-      if (name === "weather" && !weatherLoaded) { loadWeather(); weatherLoaded = true; }
+      if (name === "weather" && !weatherLoaded) loadWeather();
       window.scrollTo({ top: 0, behavior: "smooth" });
     });
   });

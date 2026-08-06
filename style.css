@@ -156,6 +156,10 @@ a { color: var(--ai); }
 .tag.alt { background: #e7decb; color: #6a5d3c; }
 .tag.opt { background: #e0eef0; color: #1f7a7a; }
 .tag.user { background: var(--cyan); color: #fff; }
+/* 旅行期間中だけ「今日」の日カードを目立たせる。
+   本命プランの枠は朱（.featured）なので、今日は春慶塗の飴色で区別する */
+.tag.today { background: var(--gold); color: #fff; }
+.plan-card.is-today { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(176,135,62,.18), var(--shadow); }
 .plan-list { list-style: none; margin: 0; padding: 0; }
 .plan-list-tools { margin: .6rem 0 0; display: flex; gap: .4rem; flex-wrap: wrap; }
 .plan-actions { margin-left: auto; display: flex; gap: .3rem; flex-wrap: wrap; }
