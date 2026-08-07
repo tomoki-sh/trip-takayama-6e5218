@@ -1552,8 +1552,12 @@ const MAP_FILTER_COLUMNS = [
   { group: "dog",    label: "犬",
     chips: () => groupsPresentIn(allPlaces(), "dog").map(([k, l]) => [k, l]) },
   { group: "status", label: "状態",   chips: () => STATUS_GROUPS },
-  // 「ルート内」＝スケジュールの予定に紐づいている地点。ラベルは実態に合わせる
-  { group: "route",  label: "予定", chips: () => [["route-only", "🗓 予定に入っている地点だけ"]], off: true },
+  /* 「ルート内」＝スケジュールの予定に紐づいている地点。ラベルは実態に合わせる。
+     ★2チップにしてあるのは「まだ入れていない地点」を探せるようにするため
+       （地図を見ながら予定を組むときに、いちばん見たいのがこれ）。
+       他の列と同じく、0個チェックも全部チェックも「素通し」。 */
+  { group: "route",  label: "予定", off: true,
+    chips: () => [["route-only", "🗓 予定に入っている"], ["route-none", "🆕 まだ入っていない"]] },
 ];
 // sets[列ID] が未設定 = 未初期化（初回に全選択にする）
 // open: 一覧表の開閉。★localStorage にも Firebase にも保存しない（見る人ごとの表示状態。追補H-9）
@@ -2167,6 +2171,13 @@ let schedDayView = "all";
      端末ごとの状態なので保存しない（追補H-9）。 */
 let schedEditing = null;
 
+/* 編集モードで地図を開いているか。★既定は閉じている。
+   スマホでは編集画面がごちゃつくと予定そのものが読めなくなるので、
+   地図は「見たい人が開くもの」にしてある。開いた地図は借り物で、
+   置き場所は syncMapDock() が決める（この変数は「開きたいか」だけを持つ）。
+   ★schedDayView と同じく端末ローカル。保存も同期もしない（追補H-9）。 */
+let schedMapOpen = false;
+
 // 候補名から予定行を作る。地点カードに一致すれば ref を付け、確定状態を引き継ぐ。
 // day は「いま見ているサブタブの日」。全体タブから足したときは初日に入る。
 function schedItemFromName(name, day) {
@@ -2268,6 +2279,11 @@ function closeSchedEditor() {
 }
 function renderSchedEditorSection() {
   const host = $("#sched-editor-host"); if (!host) return;
+  /* ★innerHTML を書く前に、借りている地図を必ず家へ返す。
+     下の2つの分岐はどちらも host.innerHTML を書き換えるので、分岐より前に置くこと。
+     ここを飛ばすと Leaflet のコンテナごと捨てられ、地図が二度と戻らない。
+     tools/test_days.js「16. 地図の間借り」がこの順序をソースでも固定している。 */
+  undockMap();
   if (!schedEditing) {
     // ★空にすると、Sortable が握っていた要素ごと GC される。フラグも戻す
     host.innerHTML = "";
@@ -2286,7 +2302,16 @@ function renderSchedEditorSection() {
         <span class="st-chip tentative">未確定</span><span>地点に紐づく行（📍）はカード・マップとも連動します</span>
       </div>
       <div class="sched-day-tabs" id="sched-day-tabs" aria-label="日の切替"></div>
-      <div class="sched-cols">
+      <!-- ★地図は既定でたたんである。開いたときだけ #map-dock が #sched-map-slot へ引っ越す。
+           スロットは .sched-cols の直下＝タイムスケジュールと横に並ぶ位置に置く。
+           ・#sched-candidates の中には入れない（renderSchedCandidates() の innerHTML で地図ごと消える）
+           ・広い画面で予定一覧の真横に来るので、ドラッグの距離が短く、両方が同時に見える -->
+      <div class="sched-map-bar">
+        <button class="btn-ghost sched-map-toggle" id="sched-map-toggle" aria-expanded="${schedMapOpen ? "true" : "false"}" aria-controls="sched-map-slot">${schedMapOpen ? "🗺 地図を閉じる" : "🗺 地図で選ぶ"}</button>
+        <span class="muted sched-map-hint">${schedMapOpen ? "ピンをつまんで予定へドラッグすると、その位置に入ります（パソコン）。スマホではピンをタップして「＋ スケジュールに追加」。" : "地図で位置関係を見ながら予定に足せます"}</span>
+      </div>
+      <div class="sched-cols${schedMapOpen ? " with-map" : ""}">
+        <div id="sched-map-slot"${schedMapOpen ? "" : " hidden"}></div>
         <div class="sched-col">
           <h4 class="sched-col-h">タイムスケジュール <span class="muted">ドラッグ並び替え・時刻入力・確定切替</span></h4>
           <ol class="sched-list" id="sched-list"></ol>
@@ -2319,12 +2344,41 @@ function renderSchedEditorSection() {
   renderScheduleEditor();
   renderSchedCandidates();
   setupSchedCandTabs();
+  setupSchedMapToggle();
   populateSchedAddSelect();
   schedSortInit = false;       // 新しい DOM に対して張り直す
   setupScheduleSortable();
   wireSchedToolbar();
   // 編集セクションは縦に長いので、出口は先頭と末尾の2か所に置く
   $$(".sched-done").forEach(b => b.addEventListener("click", closeSchedEditor));
+  /* 行にポインタを乗せると、その地点のピンが目立つ（地図を開いているときの道しるべ）。
+     ★行は data-i しか持たない。ref を data 属性に写すと同じ事実が2か所になるので、
+       schedule から引く（0-1）。 */
+  const list = $("#sched-list");
+  if (list) {
+    list.addEventListener("pointerover", e => {
+      const row = e.target && e.target.closest && e.target.closest(".sched-item");
+      const it = row ? schedule[+row.dataset.i] : null;
+      focusPin(it && it.ref);
+    });
+    list.addEventListener("pointerleave", () => focusPin(null));
+  }
+  // ★最後に地図の置き場所を決め直す。開いていれば、いま作ったスロットへ入れ直す
+  syncMapDock();
+}
+
+/* 「地図で選ぶ」の開閉。★開閉そのものはこの関数が持たず、schedMapOpen を変えて
+   syncMapDock() に判断させる。ボタンの見た目は再描画で作り直す（状態は1か所）。 */
+function setupSchedMapToggle() {
+  const btn = $("#sched-map-toggle"); if (!btn) return;
+  btn.addEventListener("click", () => {
+    schedMapOpen = !schedMapOpen;
+    renderSchedEditorSection();
+    if (schedMapOpen) {
+      const slot = $("#sched-map-slot");
+      if (slot && slot.scrollIntoView) slot.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+  });
 }
 
 /* 編集セクションのツールバー。★日別タブを開いているときはその日だけに効く（追補K-4） */
@@ -2486,6 +2540,34 @@ function populateSchedAddSelect() {
   });
 }
 
+/* 落とした場所から「どの日の、schedule の何番目に入れるか」を決める。
+   beforeNode ＝ 新しい行がその手前に入る #sched-list の子要素（null なら末尾）。
+
+   ★候補リストからのドラッグ（SortableJS の onAdd）と、地図のピンからのドラッグが
+     この1本を共有する。規則を2か所に書くと、片方だけ直して静かにズレる（0-1）。
+   ★位置の測定（elementFromPoint など）は呼ぶ側の仕事にしてある。
+     ここは DOM ノードを渡せば答えが決まる純粋な計算なので、テストで直接検査できる。 */
+function schedDropSlot(beforeNode) {
+  const list = $("#sched-list");
+  const kids = list ? Array.prototype.slice.call(list.children) : [];
+  const found = beforeNode ? kids.indexOf(beforeNode) : -1;
+  const pos = found >= 0 ? found : kids.length;   // 見つからなければ末尾に落ちたとみなす
+  // 落とした位置より上にある日付見出しが、その行の所属日になる
+  let day = schedDayView === "all" ? FIRST_DAY : schedDayView;
+  if (schedDayView === "all") {
+    for (let k = pos - 1; k >= 0; k--) {
+      if (kids[k].classList.contains("sched-day-head")) { day = normalizeDay(kids[k].dataset.day); break; }
+    }
+  }
+  // 直前の予定行の実インデックスの次に挿す
+  let at = -1;
+  for (let k = pos - 1; k >= 0; k--) {
+    if (kids[k].classList.contains("sched-item")) { at = +kids[k].dataset.i + 1; break; }
+  }
+  if (pos === 0 || at < 0) at = schedule.findIndex(it => normalizeDay(it.day) === day);
+  return { day, at: at >= 0 ? at : undefined };
+}
+
 /* 予定行を「いま見ている日」の末尾に挿す。全体タブならその日のブロックの末尾へ入る */
 function insertSchedItem(item, at) {
   if (typeof at === "number" && at >= 0) {
@@ -2569,28 +2651,12 @@ function setupScheduleSortable() {
     animation: 150, handle: ".sched-handle", draggable: ".sched-item",
     ghostClass: "sortable-ghost", chosenClass: "sortable-chosen",
     onAdd: (evt) => {
-      // 候補リストから落ちてきた要素を予定に変換
+      // 候補リストから落ちてきた要素を予定に変換。
+      // 落とし場所の解釈は schedDropSlot() が持つ（地図のピンからの投入と同じ規則）
       const name = evt.item.dataset.name;
-      const kids = Array.prototype.slice.call($("#sched-list").children);
-      const at = kids.indexOf(evt.item);
-      // 落とした位置より上にある日付見出しが、その行の所属日になる
-      let day = schedDayView === "all" ? FIRST_DAY : schedDayView;
-      if (schedDayView === "all") {
-        for (let k = at - 1; k >= 0; k--) {
-          if (kids[k].classList.contains("sched-day-head")) { day = normalizeDay(kids[k].dataset.day); break; }
-        }
-      }
-      // 直前の予定行の実インデックスの次に挿す
-      let insertAt = -1;
-      for (let k = at - 1; k >= 0; k--) {
-        if (kids[k].classList.contains("sched-item")) { insertAt = +kids[k].dataset.i + 1; break; }
-      }
-      if (at === 0 || insertAt < 0) insertAt = schedule.findIndex(it => normalizeDay(it.day) === day);
+      const slot = schedDropSlot(evt.item);   // evt.item は既にその位置へ挿し込まれている
       evt.item.remove();
-      if (name != null) {
-        const item = schedItemFromName(name, day);
-        insertSchedItem(item, insertAt >= 0 ? insertAt : undefined);
-      }
+      if (name != null) insertSchedItem(schedItemFromName(name, slot.day), slot.at);
     },
     onUpdate: () => {
       rebuildScheduleFromDom();
@@ -2860,15 +2926,40 @@ function routeIndex(id) { return routeIds.indexOf(id); }
 let map, markerLayer, routeLine;
 const markers = {}; // id -> marker
 
+/* ★初期表示の範囲は「見えるようになってから」当てる。
+   高さ0のコンテナで fitBounds を呼ぶと getBoundsZoom が最大ズーム(18)に張り付き、
+   あとから invalidateSize() を呼んでも直らない（invalidateSize は中心をずらすだけで
+   ズームを計算し直さない）。マップタブを一度も開かずに編集モードで地図を出すと
+   この経路に入るため、当たるまで持ち越す。
+   なお fitBounds を当てるまで Leaflet は _loaded にならず、addLayer は内部で
+   キューに積まれるだけなので、先にピンや点線を足しておいても落ちない。 */
+let pendingFit = null;
+function fitMapToPlaces() {
+  if (!map || !pendingFit) return;
+  const el = $("#map");
+  if (!el || !el.clientHeight) return;   // まだ見えていない。次の機会に当てる
+  map.fitBounds(pendingFit.pad(0.15));
+  pendingFit = null;
+}
+
 function makeIcon(p, id) {
   const idx = routeIndex(id);
   let ring = "";
   if (idx >= 0) ring = "ring-route";
   else if (getStatus(id) === "confirmed") ring = "ring-confirmed";
   const num = idx >= 0 ? `<span class="pin-num">${idx + 1}</span>` : "";
+  /* ★data-id は「地図から予定へドラッグする」ときの持ち手。#map に張った1本の
+     pointerdown がここから地点を引くので、マーカーごとに listener を張らずに済む。
+     ★title で「もう予定に入っている（N番）」を明示する。番号は routeIds の
+     ＊最初の出現＊の順で、同じ地点をもう一度予定に足しても動かない（往復で
+     起終点が2回出てくるため、あえて重複を除いている）。動かないことを黙って
+     見せると「操作が効かなかった」と読まれるので、掴む前に分かるようにしておく。 */
+  const label = idx >= 0
+    ? `${p.name}（すでに予定 ${idx + 1} 番目に入っています）`
+    : `${p.name}（まだ予定に入っていません）`;
   return L.divIcon({
     className: "",
-    html: `<div class="pin pin-${p.type} ${ring}"><span>${TYPE_ICONS[p.type]}</span>${num}</div>`,
+    html: `<div class="pin pin-${p.type} ${ring}" data-id="${esc(id)}" title="${esc(label)}"><span>${TYPE_ICONS[p.type]}</span>${num}</div>`,
     iconSize: [30, 30], iconAnchor: [15, 28], popupAnchor: [0, -28]
   });
 }
@@ -2919,10 +3010,15 @@ function currentFilters() {
   const days = dayInputs.length ? get("day") : DAY_KEYS.slice();
   // 「犬」フィルタ。列が無ければ null＝素通し（犬連れでない旅行では列ごと外せる）
   const dogInputs = $$(`.filter-group[data-group="dog"] input`);
-  const routeInput = $(`.filter-group[data-group="route"] input`);
+  /* 「予定」フィルタ。★1つ目のチップを決め打ちで読まないこと。
+     チップを増やしたときに、読む対象が並び順で入れ替わって静かに壊れる。
+     他の列と同じく「チェックされた値の配列」で持ち、
+     0個（＝どちらも選んでいない）と全部チェックはどちらも素通しにする。 */
+  const routeInputs = $$(`.filter-group[data-group="route"] input`);
+  const plan = get("route");
   return { type: get("type"), status: get("status"),
            dog: dogInputs.length ? get("dog") : null,
-           routeOnly: !!(routeInput && routeInput.checked),
+           plan, planFilterOn: routeInputs.length > 0 && plan.length > 0 && plan.length < routeInputs.length,
            days, dayFilterOn: dayInputs.length > 0 && days.length < DAY_KEYS.length };
 }
 /* いま表示対象になっている日の地点だけを、スケジュール順に並べて返す
@@ -2963,7 +3059,9 @@ function applyFilters() {
     // 犬の条件はカードと同じ groupKeyOf() で引く。dogKey の付け忘れは "other" になり
     // どの区分にも入らないので静かに消える（test_cardtools.js が全件を検査している）
     const dogOk = !f.dog || f.dog.includes(groupKeyOf(p, "dog"));
-    const show = f.type.includes(p.type) && f.status.includes(getStatus(id)) && dayOk && dogOk && (!f.routeOnly || inRoute);
+    // 予定に入っているか。チップの値と対にして、日・犬と同じ「列内は OR」で扱う
+    const planOk = !f.planFilterOn || f.plan.includes(inRoute ? "route-only" : "route-none");
+    const show = f.type.includes(p.type) && f.status.includes(getStatus(id)) && dayOk && dogOk && planOk;
     if (show) { shown++; if (!markerLayer.hasLayer(m)) m.addTo(markerLayer); }
     else { if (markerLayer.hasLayer(m)) markerLayer.removeLayer(m); }
   });
@@ -3000,6 +3098,27 @@ function refreshMarkers() {
     if (markers[id]) markers[id].setIcon(makeIcon(p, id));
   });
 }
+/* 予定の行にポインタを乗せたとき、その地点のピンを目立たせる。
+   ★状態は持たない。クラスを付けて外すだけなので、refreshMarkers() でピンが
+     作り直されても次にポインタを乗せた時点で付き直る（ズレが残らない）。 */
+function focusPin(id) {
+  $$("#map .pin.is-focus").forEach(el => el.classList.remove("is-focus"));
+  if (!id || !markers[id] || !markers[id].getElement) return;
+  const el = markers[id].getElement();
+  const pin = el && el.querySelector(".pin");
+  if (pin) pin.classList.add("is-focus");
+}
+/* ピンから予定行へ。編集中で一覧が出ているときだけ意味がある */
+function scrollSchedRowIntoView(id) {
+  if (!id || !$("#sched-list")) return;
+  const i = schedule.findIndex(it => it.ref === id);
+  if (i < 0) return;
+  const row = $$("#sched-list > li.sched-item").find(li => +li.dataset.i === i);
+  if (!row) return;   // 別の日を表示中で、その行が出ていない
+  if (row.scrollIntoView) row.scrollIntoView({ behavior: "smooth", block: "center" });
+  row.classList.add("is-flash");
+  setTimeout(() => row.classList.remove("is-flash"), 1200);
+}
 function setupMap() {
   map = L.map("map", { scrollWheelZoom: false });
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -3018,7 +3137,8 @@ function setupMap() {
   });
   drawRouteLine();
   applyFilters();
-  map.fitBounds(L.latLngBounds(pts).pad(0.15));
+  pendingFit = L.latLngBounds(pts);
+  fitMapToPlaces();       // ★見えていれば今すぐ、見えていなければ次の機会に（上の説明）
 
   // フィルタ
   $$("#map-filters input").forEach(i => i.addEventListener("change", () => {
@@ -3031,7 +3151,203 @@ function setupMap() {
   map.on("popupopen", (e) => {
     const btn = e.popup._contentNode.querySelector("[data-add-sched]");
     if (btn) btn.addEventListener("click", () => { map.closePopup(); addPlaceToSchedule(btn.dataset.addSched); });
+    // 編集中に地図を開いているときは、その地点の予定行まで一覧を送る（逆方向の道しるべ）
+    if (btn) scrollSchedRowIntoView(btn.dataset.addSched);
   });
+
+  // ピンをスケジュールへドラッグする配線（パソコンのみ。中で判定している）
+  setupPinDrag();
+}
+
+/* 地図の遅延初期化はここだけ。マップタブと、編集モードの「地図で選ぶ」の両方から呼ぶ。
+   ★「初期化済みか」を別のフラグで持たない。map の有無がそのまま答えなので、
+     フラグを足すと同じ事実が2か所になる（0-1）。 */
+function ensureMap() {
+  if (map || typeof L === "undefined" || !$("#map")) return;
+  setupMap();
+}
+/* 地図を見せたあとに必ず呼ぶ。非表示の div の中でサイズが 0 のままになっているのを直す */
+function revealMap() {
+  if (!map) return;
+  map.invalidateSize();
+  fitMapToPlaces();
+}
+
+/* ===== 地図の間借り（編集モードへの引っ越し） =====
+   ★地図は1つしか作らない。編集モードで「地図で選ぶ」を開いたときは、
+     2つ目を作るのではなく #map-dock ごと引っ越す。2つ持つと「いまどのピンが
+     出ているか」という同じ事実が2か所になり、refreshMarkers()／applyFilters()／
+     drawRouteLine()／currentFilters() を両方に効かせる同期コードが要る。
+     それは二重化を固定するということで、かつて廃止した「スケジュールの控え」と
+     同じ轍を踏む（0-1）。同期を足して解決しようとしない。
+
+   ★置き場所は「状態から毎回決める」。routeFromSchedule() と同じ考え方で、
+     「編集セクションを作り直す前に地図を返すのを忘れないこと」という
+     人間向けの手順を作らない（0-3）。判断者は syncMapDock() ただ一つ。 */
+function undockMap() {
+  endPinDrag();   // ★引っ越しの前に、進行中のドラッグを畳む（地図が固まったままにしない）
+  const dock = $("#map-dock"), home = $("#map-dock-home");
+  if (!dock || !home) return;
+  if (dock.parentNode !== home) home.appendChild(dock);
+  dock.classList.remove("in-editor");
+}
+function syncMapDock() {
+  const dock = $("#map-dock"), home = $("#map-dock-home"), slot = $("#sched-map-slot");
+  if (!dock || !home) return;
+  const schedPanel = $("#panel-schedule");
+  const schedVisible = !!schedPanel && schedPanel.classList.contains("active");
+  const wantSlot = !!slot && !!schedEditing && schedMapOpen && schedVisible;
+  const target = wantSlot ? slot : home;
+  if (dock.parentNode === target) return;
+  if (!wantSlot) { undockMap(); return; }
+  target.appendChild(dock);
+  dock.classList.add("in-editor");
+  ensureMap();   // マップタブを一度も開いていなくても、ここで作られる
+  revealMap();   // 新しい親でサイズを測り直し、持ち越していた初期表示の範囲を当てる
+}
+
+/* ===== 地図のピンをスケジュールへドラッグして入れる（プランニング） =====
+   ★書き換えるのは正本の schedule だけ。導出値の routeIds には触らない。
+     触っても次の syncRouteFromSchedule() が作り直すので黙って消える
+     （チェックリストD／追補F-24）。落とし場所の解釈は schedDropSlot() に任せ、
+     投入は insertSchedItem() を通す＝スケジュールへの書き込み経路を増やさない。
+
+   ★SortableJS でも HTML5 の dragstart でもなく Pointer Events を直に使う理由:
+     ・Leaflet のマーカーは transform で配置され DOM の並び順に意味がない。
+       SortableJS の「並べ替え」モデルに乗らない
+     ・HTML5 の dragstart は iOS Safari で発火しない
+     ・どのみち map.dragging を止めないと、ピンを掴んだ瞬間に地図がパンする
+
+   ★ドラッグの最中に掴んでいる .pin が消えることがある。refreshMarkers() → setIcon()
+     は Leaflet の DivIcon が innerHTML で中身を作り直すので、同行者の編集が
+     Firebase で届いただけで要素が入れ替わる。そのため:
+     ・setPointerCapture() を使わない（要素が消えると pointerup が届かず、
+       map.dragging.enable() が永久に呼ばれずに地図が操作不能になる）
+     ・move / up / cancel は window に張る
+     ・地点は掴んだ時点で控える（落とすときに DOM から読み直さない）
+     ・落とし先は落とした瞬間に解決する（hover 中に覚えておかない） */
+const PIN_DRAG_THRESHOLD = 8;   // これ未満の動きはタップ扱い（ポップアップを開く）
+let pinDrag = null;
+let pinScrollRaf = 0, pinScrollDir = 0;
+
+/* ★スマホでは登録しない。地図は「見るため」に開くもので、予定への投入は
+   ポップアップの「＋ スケジュールに追加」を使う。
+   「スマホでは使わない」を人の記憶ではなくメディアクエリで担保する（0-3）。 */
+function pinDragEnabled() {
+  return typeof window.matchMedia === "function"
+      && window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+}
+function setupPinDrag() {
+  const el = $("#map");
+  if (!el || el.dataset.pinDrag || !pinDragEnabled()) return;
+  el.dataset.pinDrag = "1";     // #map は作り直さないので、この1本で足りる
+  el.addEventListener("pointerdown", onPinDown);
+}
+/* 地図側のジェスチャはまとめて止め、まとめて戻す。片方だけ戻し忘れると
+   「パンできないのにスクロールは通る」という分かりにくい壊れ方をする。 */
+function setMapGestures(on) {
+  ["dragging", "touchZoom", "tapHold"].forEach(k => {
+    if (map && map[k]) map[k][on ? "enable" : "disable"]();
+  });
+}
+
+function onPinDown(e) {
+  if (!e.isPrimary || (e.button != null && e.button > 0)) return;
+  const pin = e.target && e.target.closest && e.target.closest(".pin[data-id]");
+  if (!pin || !$("#sched-list")) return;   // 編集モードで地図を開いているときだけ効く
+  const place = getPlaceById(pin.dataset.id);
+  if (!place) return;
+  endPinDrag();
+  pinDrag = { name: place.name, x0: e.clientX, y0: e.clientY, moved: false, ghost: null };
+  setMapGestures(false);
+  window.addEventListener("pointermove", onPinMove);
+  window.addEventListener("pointerup", onPinUp);
+  window.addEventListener("pointercancel", onPinUp);
+}
+function onPinMove(e) {
+  if (!pinDrag) return;
+  if (!e.isPrimary) { endPinDrag(); return; }   // 2本目の指が来たら中止（座標が崩れる）
+  if (!pinDrag.moved) {
+    if (Math.abs(e.clientX - pinDrag.x0) < PIN_DRAG_THRESHOLD &&
+        Math.abs(e.clientY - pinDrag.y0) < PIN_DRAG_THRESHOLD) return;
+    pinDrag.moved = true;
+    pinDrag.ghost = document.createElement("div");
+    pinDrag.ghost.className = "pin-ghost";
+    pinDrag.ghost.textContent = pinDrag.name;
+    document.body.appendChild(pinDrag.ghost);
+  }
+  e.preventDefault();
+  pinDrag.ghost.style.left = e.clientX + "px";
+  pinDrag.ghost.style.top = e.clientY + "px";
+  markDropTarget(dropTargetAt(e.clientX, e.clientY));
+  const list = $("#sched-list");
+  const r = list && list.getBoundingClientRect();
+  pinScrollDir = !r ? 0 : (e.clientY < r.top + 48 ? -1 : e.clientY > r.bottom - 48 ? 1 : 0);
+  if (pinScrollDir && !pinScrollRaf) pinScrollRaf = requestAnimationFrame(pinAutoScroll);
+}
+function onPinUp(e) {
+  if (!pinDrag) return;
+  const moved = pinDrag.moved, name = pinDrag.name;
+  const target = moved ? dropTargetAt(e.clientX, e.clientY) : null;
+  endPinDrag();                 // ★先に畳む。このあと何が起きても地図は生き返る
+  if (!moved || !target) return;   // タップ、または一覧の外＝ポップアップに任せる
+  /* ★落とし先は「いま」の DOM から解決する。ドラッグ中に同行者の編集が届いて
+     一覧が描き直されていることがあるので、hover 中に覚えた行は当てにしない。 */
+  const before = target.before && target.before.isConnected ? target.before : null;
+  const slot = schedDropSlot(before);
+  insertSchedItem(schedItemFromName(name, slot.day), slot.at);
+}
+function endPinDrag() {
+  if (!pinDrag) return;
+  const moved = pinDrag.moved;
+  if (pinDrag.ghost) pinDrag.ghost.remove();
+  markDropTarget(null);
+  if (pinScrollRaf) cancelAnimationFrame(pinScrollRaf);
+  pinScrollRaf = 0; pinScrollDir = 0;
+  window.removeEventListener("pointermove", onPinMove);
+  window.removeEventListener("pointerup", onPinUp);
+  window.removeEventListener("pointercancel", onPinUp);
+  pinDrag = null;
+  setMapGestures(true);         // ★どの出口を通っても、必ずここを通ること
+  if (moved) {
+    // 実際に動かしたあとの合成 click でポップアップが開かないよう、1回だけ握り潰す
+    const el = $("#map");
+    if (el) el.addEventListener("click", ev => { ev.stopPropagation(); ev.preventDefault(); },
+                                { capture: true, once: true });
+  }
+}
+function pinAutoScroll() {
+  pinScrollRaf = 0;
+  if (!pinDrag || !pinScrollDir) return;
+  const list = $("#sched-list");
+  // 一覧が自前のスクロール枠を持っていればそれを、無ければページを動かす
+  if (list && list.scrollHeight > list.clientHeight + 1) list.scrollTop += pinScrollDir * 14;
+  else window.scrollBy(0, pinScrollDir * 14);
+  pinScrollRaf = requestAnimationFrame(pinAutoScroll);
+}
+/* ポインタの真下が一覧のどの行の手前かを返す。一覧の外なら null。
+   ★行の矩形で判定する。行と行のすき間に落としても受け付けたいので
+     elementFromPoint（＝真下の1要素）は使わない。 */
+function dropTargetAt(x, y) {
+  const list = $("#sched-list"); if (!list) return null;
+  const r = list.getBoundingClientRect();
+  if (x < r.left || x > r.right || y < r.top || y > r.bottom) return null;
+  const rows = $$("#sched-list > li");
+  for (let i = 0; i < rows.length; i++) {
+    const rr = rows[i].getBoundingClientRect();
+    if (y < rr.top + rr.height / 2) return { before: rows[i] };
+  }
+  return { before: null };   // 末尾へ
+}
+/* 落ちる場所の目印。★行を挿し込まずクラスだけで出す（挿し込むと
+   schedDropSlot() が数える子要素が変わってしまう）。 */
+function markDropTarget(target) {
+  const list = $("#sched-list"); if (!list) return;
+  $$("#sched-list > li.drop-before").forEach(el => el.classList.remove("drop-before"));
+  list.classList.remove("drop-end");
+  if (!target) return;
+  if (target.before) target.before.classList.add("drop-before");
+  else list.classList.add("drop-end");
 }
 
 /* =========================================================================
@@ -3166,17 +3482,20 @@ async function loadWeather() {
    タブ切替
    ========================================================================= */
 function setupTabs() {
-  let mapReady = false;   // weatherLoaded は loadWeather() 側（成功時だけ立てる）
-  $$("#tabs .tab").forEach(tab => {
+  $$("#tabs .tab").forEach(tab => {   // weatherLoaded は loadWeather() 側（成功時だけ立てる）
     tab.addEventListener("click", () => {
       $$("#tabs .tab").forEach(t => t.classList.remove("active"));
       $$(".panel").forEach(p => p.classList.remove("active"));
       tab.classList.add("active");
       const name = tab.dataset.tab;
       $("#panel-" + name).classList.add("active");
+      // ★どのタブへ移っても地図の置き場所を決め直す。
+      //   これを忘れると、編集モードに地図を貸したままマップタブへ行ったとき
+      //   マップタブが空になる（syncMapDock() が唯一の判断者）。
+      syncMapDock();
       if (name === "map") {
-        if (!mapReady) { setupMap(); mapReady = true; }
-        setTimeout(() => map && map.invalidateSize(), 60);
+        ensureMap();
+        setTimeout(revealMap, 60);
       }
       if (name === "weather" && !weatherLoaded) loadWeather();
       window.scrollTo({ top: 0, behavior: "smooth" });

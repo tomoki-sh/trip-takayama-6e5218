@@ -305,6 +305,25 @@ a { color: var(--ai); }
 .sched-cols { display: grid; grid-template-columns: 1fr; gap: 1rem; }
 .sched-col-h { margin: 0 0 .5rem; font-size: .92rem; color: var(--ai); }
 .sched-col-h .muted { font-weight: 400; }
+/* 「地図で選ぶ」の開閉バー。★既定は閉じているので、スマホの編集画面に増えるのはこの1行だけ */
+.sched-map-bar { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem .6rem; margin-bottom: .55rem; }
+.sched-map-hint { font-size: .75rem; }
+#sched-map-slot[hidden] { display: none; }
+
+/* ピンを予定へドラッグしているときの表示。★パソコンだけで起きる（app.js の pinDragEnabled）。
+   ゴーストは pointer-events:none にしないと、自分自身が落下先の判定を邪魔する。 */
+.pin-ghost {
+  position: fixed; z-index: 2000; pointer-events: none;
+  transform: translate(-50%, -160%);
+  background: var(--ai); color: #fff; font-size: .78rem; font-weight: 600;
+  padding: .3rem .6rem; border-radius: 999px; box-shadow: var(--shadow);
+  max-width: 16rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+/* 落ちる場所の目印。行を挿し込まずクラスだけで出す（挿し込むと schedDropSlot() の数え方が狂う） */
+.sched-list > li.drop-before { box-shadow: inset 0 3px 0 0 var(--cyan); }
+.sched-list.drop-end { box-shadow: inset 0 -3px 0 0 var(--cyan); }
+/* ピンから予定行へ飛んだときの目印（すぐ消える） */
+.sched-list > li.is-flash { background: var(--kinari-2); }
 .sched-cand-tabs { display: flex; flex-wrap: wrap; gap: .3rem; margin-bottom: .55rem; }
 .sched-cand-tab { border: 1px solid var(--line); background: var(--card); color: var(--ai); font: inherit; font-size: .78rem; padding: .26rem .62rem; border-radius: 999px; cursor: pointer; white-space: nowrap; }
 .sched-cand-tab:hover { background: var(--kinari-2); }
@@ -362,6 +381,16 @@ a { color: var(--ai); }
 .sched-cand-item .cand-add { border: none; background: none; cursor: pointer; color: var(--cyan); font-size: 1rem; width: 26px; height: 26px; border-radius: 50%; flex: 0 0 auto; }
 .sched-cand-item .cand-add:hover { background: #def0f0; }
 @media (min-width: 760px) { .sched-cols { grid-template-columns: 1.5fr 1fr; align-items: start; } }
+/* 地図を開いているときの並び。★地図と予定一覧が同時に見えていないとドラッグできない（追補M）。
+   #sched-map-slot は閉じているとき hidden＝display:none なので、
+   そのときのグリッドは上の既定（1.5fr 1fr）のまま変わらない。 */
+@media (min-width: 760px) {
+  .sched-cols.with-map { grid-template-columns: 1fr 1fr; }         /* 地図 ｜ 予定（候補は次の行） */
+  .sched-cols.with-map .sched-list { max-height: 480px; overflow-y: auto; }
+}
+@media (min-width: 1180px) {
+  .sched-cols.with-map { grid-template-columns: 1fr 1.15fr .8fr; } /* 地図 ｜ 予定 ｜ 候補 */
+}
 
 /* ===== カード ===== */
 .cards { display: grid; gap: 1.1rem; grid-template-columns: 1fr; }
@@ -462,6 +491,18 @@ a { color: var(--ai); }
 
 /* ===== マップ ===== */
 #map { height: 60vh; min-height: 360px; border-radius: var(--radius); border: 1px solid var(--line); box-shadow: var(--shadow); margin-bottom: 1rem; }
+/* ★編集モードへ間借りしているときの地図。#map の派生なので隣に並べる（追補F-19）。
+   高さを vh から px へ変えるのが要点: Leaflet は window の resize を掴んで
+   invalidateSize() → 地図をパンさせる。編集セクションは入力欄だらけで、
+   スマホのソフトキーボードが resize を撃つため、vh のままだと入力中に地図が動く。
+   打ち消したい min-height / margin も明示的に書く。 */
+#map-dock.in-editor #map { height: 420px; min-height: 0; margin-bottom: 0; }
+/* ★間借り中はフィルタを低くする。マップタブと同じ高さのまま出すと、
+   狭い列ではチップが折り返して500px近くになり、地図が画面の外へ押し出される。
+   件数バッジは見出し行にあるので、畳んでも「何地点出ているか」は分かる。 */
+#map-dock.in-editor .map-filters { max-height: 168px; overflow-y: auto; margin-bottom: .5rem; font-size: .95em; }
+/* 狭い画面では地図が予定一覧の上に積まれるので、低めにして一覧を押し下げすぎない */
+@media (max-width: 759px) { #map-dock.in-editor #map { height: 300px; } }
 .filter-label { font-size: .78rem; font-weight: 700; color: var(--ai); }
 .chip {
   display: inline-flex; align-items: center; gap: .25rem; font-size: .8rem;
@@ -541,6 +582,10 @@ a { color: var(--ai); }
 .pin.ring-confirmed { box-shadow: 0 0 0 3px rgba(217,84,47,.55), 0 2px 6px rgba(0,0,0,.35); }
 .pin.ring-warning { box-shadow: 0 0 0 3px rgba(192,57,43,.6), 0 2px 6px rgba(0,0,0,.35); }
 .pin.ring-route { box-shadow: 0 0 0 3px rgba(31,156,156,.7), 0 2px 6px rgba(0,0,0,.35); }
+/* 予定の行にポインタを乗せたときの相方。★ring より後ろに書いて box-shadow を勝たせる */
+.pin.is-focus { box-shadow: 0 0 0 5px rgba(31,156,156,.9), 0 4px 10px rgba(0,0,0,.4); z-index: 1000; }
+/* ドラッグの持ち手であることを見せる（パソコンのみ。タッチ端末では掴めない） */
+@media (hover: hover) and (pointer: fine) { .pin { cursor: grab; } .pin:active { cursor: grabbing; } }
 .pin-num {
   position: absolute; top: -10px; right: -10px; transform: rotate(45deg);
   background: var(--cyan); color: #fff; font-size: 11px; font-weight: 700;

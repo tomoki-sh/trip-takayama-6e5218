@@ -22,7 +22,7 @@
        「新しい index.html ＋ 古い app.js」の組み合わせが起き、
        タブは増えているのに中身が空、という状態になる。
        ★内容を更新して push するときは、必ずこの数字を +1 すること（3か所とも同じ値）。 -->
-  <link rel="stylesheet" href="style.css?v=428eebbc" />
+  <link rel="stylesheet" href="style.css?v=461b4375" />
 </head>
 <body>
   <header class="hero">
@@ -72,9 +72,18 @@
     <section class="panel" id="panel-map">
       <h2 class="panel-title">マップ</h2>
       <p class="panel-lead">ピンをタップで詳細。<strong>下の「回る順番」はスケジュールの本命プランから自動で作られます</strong>（順番を変えるにはスケジュールタブで編集してください）。<strong>「日」でしぼると、その日に行く地点だけが残り、「Googleマップでルートを開く」もその日のナビになります</strong>（経由地は9件までしか渡せないため、5日ぶんをまとめてナビには使えません）。<strong>「犬」でしぼると、犬と一緒に入れる場所だけを地図で探せます</strong>（こちらは点線とナビには影響しません）。</p>
-      <!-- 中身は app.js の renderMapFilters() が MAP_FILTER_COLUMNS から描く。ここには何も書かない -->
-      <div class="map-filters" id="map-filters"></div>
-      <div id="map"></div>
+      <!-- ★#map-dock は「地図とそのフィルタ」をひとまとめにした引っ越し単位。
+           スケジュールタブの編集モードで「地図で選ぶ」を開いたとき、そちらへ丸ごと移る。
+           家はこの #map-dock-home で、置き場所を決めるのは app.js の syncMapDock() だけ。
+           ・1ノードにまとめてあるので、引っ越しで動かすのは常に1回の appendChild で済む
+           ・フィルタの change 結線は input 自身に付いているので、移動しても外れない
+           中身は app.js の renderMapFilters() が MAP_FILTER_COLUMNS から描く。ここには何も書かない -->
+      <div id="map-dock-home">
+        <div id="map-dock">
+          <div class="map-filters" id="map-filters"></div>
+          <div id="map"></div>
+        </div>
+      </div>
 
       <!-- 回る順番。★閲覧専用。並べ替え・追加・削除の手段は置かない
            （スケジュールから自動で作られる導出値なので、ここで編集させると黙って消える） -->
@@ -186,7 +195,7 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
           integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js" defer></script>
-  <script src="app.js?v=428eebbc" defer></script>
+  <script src="app.js?v=461b4375" defer></script>
 
   <!-- Firebase リアルタイム同期（スケジュール・確定状態・ルートを全員で共有）
        apiKey 等は秘密情報ではなく識別子。保護は Realtime Database のルール（匿名ログイン限定）で行う。 -->
