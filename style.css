@@ -232,6 +232,18 @@ a { color: var(--ai); }
 
 /* ===== 編集できるスケジュール ===== */
 .sched-editor { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); padding: .9rem; margin-bottom: 1.2rem; }
+/* ★地図を開いている間だけ、読み物用の 960px（.container）から外へ広げる。
+   大きいモニターで地図が小さいままにならないようにするため。
+   サイト全体の幅は変えない——他タブの行長とカードの列数は意図して 960px にしてある。
+   jsdom は var() を含む宣言を丸ごと捨てるので、この見た目はテストで担保できない（0-6）。 */
+@media (min-width: 1080px) {
+  .sched-editor.with-map {
+    /* 3rem 引くのは、100vw が縦スクロールバーの幅を含むため（引かないと横スクロールが出る） */
+    --editor-w: min(1900px, calc(100vw - 3rem));
+    width: var(--editor-w);
+    margin-left: calc((100% - var(--editor-w)) / 2);
+  }
+}
 .sched-legend { display: flex; flex-wrap: wrap; align-items: center; gap: .35rem .5rem; font-size: .8rem; color: #5c554a; margin-bottom: .7rem; }
 .sched-list { list-style: none; margin: 0 0 .7rem; padding: 0; display: flex; flex-direction: column; gap: .45rem; }
 /* ★行の組み立て: 上段＝時刻と操作、下段＝予定（つねに全幅）。
@@ -317,11 +329,18 @@ a { color: var(--ai); }
   transform: translate(-50%, -160%);
   background: var(--ai); color: #fff; font-size: .78rem; font-weight: 600;
   padding: .3rem .6rem; border-radius: 999px; box-shadow: var(--shadow);
-  max-width: 16rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  max-width: 20rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
-/* 落ちる場所の目印。行を挿し込まずクラスだけで出す（挿し込むと schedDropSlot() の数え方が狂う） */
+.pin-ghost.is-onto { background: var(--cyan); }
+/* ★ドラッグと確定したあとだけ範囲選択を止める。pointerdown では preventDefault
+   できない（Leaflet のクリック→ポップアップが死ぬ）ので、そのぶんブラウザの
+   既定のドラッグ選択が始まってしまう。最初から止めると本文をコピーできなくなる。 */
+body.pin-dragging, body.pin-dragging * { user-select: none; -webkit-user-select: none; }
+/* 落ちる場所の目印。行を挿し込まずクラスだけで出す（挿し込むと schedDropSlot() の数え方が狂う）。
+   線＝行と行の間に入る／枠＝その行に地点が紐づく。 */
 .sched-list > li.drop-before { box-shadow: inset 0 3px 0 0 var(--cyan); }
 .sched-list.drop-end { box-shadow: inset 0 -3px 0 0 var(--cyan); }
+.sched-list > li.drop-onto { outline: 2px solid var(--cyan); outline-offset: -2px; background: var(--kinari-2); }
 /* ピンから予定行へ飛んだときの目印（すぐ消える） */
 .sched-list > li.is-flash { background: var(--kinari-2); }
 .sched-cand-tabs { display: flex; flex-wrap: wrap; gap: .3rem; margin-bottom: .55rem; }
@@ -388,8 +407,13 @@ a { color: var(--ai); }
   .sched-cols.with-map { grid-template-columns: 1fr 1fr; }         /* 地図 ｜ 予定（候補は次の行） */
   .sched-cols.with-map .sched-list { max-height: 480px; overflow-y: auto; }
 }
+/* 地図の高さと足並みをそろえる（下の #map-dock.in-editor #map と対） */
+@media (min-height: 900px) { .sched-cols.with-map .sched-list { max-height: 640px; } }
+/* 地図 ｜ 予定 ｜ 候補。★地図に多めに割り当てる。均等にすると、3カラムへ切り替わった
+   とたんに地図が2カラムのときより狭くなる（1512px で実測 474px < 1080px の 492px）。
+   候補リストは店名が並ぶだけなので狭くてよい。 */
 @media (min-width: 1180px) {
-  .sched-cols.with-map { grid-template-columns: 1fr 1.15fr .8fr; } /* 地図 ｜ 予定 ｜ 候補 */
+  .sched-cols.with-map { grid-template-columns: 1.35fr 1.15fr .75fr; }
 }
 
 /* ===== カード ===== */
@@ -497,6 +521,9 @@ a { color: var(--ai); }
    スマホのソフトキーボードが resize を撃つため、vh のままだと入力中に地図が動く。
    打ち消したい min-height / margin も明示的に書く。 */
 #map-dock.in-editor #map { height: 420px; min-height: 0; margin-bottom: 0; }
+/* 縦に余裕のある画面ではもう少し高く。★vh ではなく px の段階指定にする理由は追補F-26-3
+   （vh だとソフトキーボードの resize のたびに Leaflet が地図をパンさせる） */
+@media (min-height: 900px) { #map-dock.in-editor #map { height: 560px; } }
 /* ★間借り中はフィルタを低くする。マップタブと同じ高さのまま出すと、
    狭い列ではチップが折り返して500px近くになり、地図が画面の外へ押し出される。
    件数バッジは見出し行にあるので、畳んでも「何地点出ているか」は分かる。 */

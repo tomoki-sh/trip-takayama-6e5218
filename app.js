@@ -2291,7 +2291,7 @@ function renderSchedEditorSection() {
     return;
   }
   host.innerHTML = `
-    <div class="sched-editor is-editing">
+    <div class="sched-editor is-editing${schedMapOpen ? " with-map" : ""}">
       <div class="sched-edit-head">
         <h3 class="sched-subhead">編集中${schedEditing === "all" ? "（全体）" : `（${esc(dayLabel(schedEditing))}）`}</h3>
         <button class="btn-primary sched-done">編集を終える</button>
@@ -2308,7 +2308,7 @@ function renderSchedEditorSection() {
            ・広い画面で予定一覧の真横に来るので、ドラッグの距離が短く、両方が同時に見える -->
       <div class="sched-map-bar">
         <button class="btn-ghost sched-map-toggle" id="sched-map-toggle" aria-expanded="${schedMapOpen ? "true" : "false"}" aria-controls="sched-map-slot">${schedMapOpen ? "🗺 地図を閉じる" : "🗺 地図で選ぶ"}</button>
-        <span class="muted sched-map-hint">${schedMapOpen ? "ピンをつまんで予定へドラッグすると、その位置に入ります（パソコン）。スマホではピンをタップして「＋ スケジュールに追加」。" : "地図で位置関係を見ながら予定に足せます"}</span>
+        <span class="muted sched-map-hint">${schedMapOpen ? "ピンをつまんで予定へドラッグ（パソコン）。<strong>行と行の間に落とすと新しい予定が入り、行の真ん中に落とすとその予定にその地点が紐づきます</strong>。スマホではピンをタップして「＋ スケジュールに追加」。" : "地図で位置関係を見ながら予定に足せます"}</span>
       </div>
       <div class="sched-cols${schedMapOpen ? " with-map" : ""}">
         <div id="sched-map-slot"${schedMapOpen ? "" : " hidden"}></div>
@@ -2457,17 +2457,7 @@ function renderScheduleEditor() {
   }));
   // 地点の紐づけ。★ここを変えるとマップのピン順（ルート）と確定状態の出どころが変わる
   $$("#sched-list .sched-ref").forEach(el => el.addEventListener("change", e => {
-    const it = schedule[+e.currentTarget.dataset.i], v = e.currentTarget.value;
-    if (v) {
-      // 紐づけると確定状態は共有ステート（getStatus）に従うようになる。表示が切り替わるのは正しい
-      it.ref = v;
-    } else {
-      // 解除するときは、いまの見た目の状態を行に写しておく（勝手に未確定へ落ちないように）
-      it.status = it.ref ? getStatus(it.ref) : (it.status === "confirmed" ? "confirmed" : "tentative");
-      delete it.ref;
-    }
-    // select の change なので再描画してよい（テキスト入力と違いカーソルもIME変換も飛ばない）
-    saveSchedule(); syncRouteFromSchedule(); renderScheduleEditor();
+    setSchedRef(+e.currentTarget.dataset.i, e.currentTarget.value);
   }));
   updateSchedDayCounts();
 }
@@ -2538,6 +2528,27 @@ function populateSchedAddSelect() {
     if (p) insertSchedItem(schedItemFromName(p.name));
     sel.value = "";
   });
+}
+
+/* 予定行と地点の紐づけを変える唯一の関数。ref が空なら解除。
+   ★各行のプルダウンの change と、マップのピンを行の真ん中へ落としたときが
+     どちらもここを通る。2か所で書くと、片方だけ直して静かにズレる（0-1）。
+   ★ここを変えるとマップのピン順（ルート）と確定状態の出どころが変わる。 */
+function setSchedRef(i, ref) {
+  const it = schedule[i]; if (!it) return;
+  if (ref) {
+    // 紐づけると確定状態は共有ステート（getStatus）に従うようになる。表示が切り替わるのは正しい
+    it.ref = ref;
+    // 「＋ 空の行」で作った行は本文が空。空のときだけ地点名を入れる。
+    // 本文がすでにあるときは触らない（「八尾で昼食を済ませる」の文面を勝手に変えない）
+    if (!it.text) it.text = (getPlaceById(ref) || {}).name || "";
+  } else {
+    // 解除するときは、いまの見た目の状態を行に写しておく（勝手に未確定へ落ちないように）
+    it.status = it.ref ? getStatus(it.ref) : (it.status === "confirmed" ? "confirmed" : "tentative");
+    delete it.ref;
+  }
+  // 再描画してよい（テキスト入力と違い、カーソルもIME変換も飛ばない操作からしか呼ばれない）
+  saveSchedule(); syncRouteFromSchedule(); renderScheduleEditor();
 }
 
 /* 落とした場所から「どの日の、schedule の何番目に入れるか」を決める。
@@ -3258,7 +3269,7 @@ function onPinDown(e) {
   const place = getPlaceById(pin.dataset.id);
   if (!place) return;
   endPinDrag();
-  pinDrag = { name: place.name, x0: e.clientX, y0: e.clientY, moved: false, ghost: null };
+  pinDrag = { id: pin.dataset.id, name: place.name, x0: e.clientX, y0: e.clientY, moved: false, ghost: null };
   setMapGestures(false);
   window.addEventListener("pointermove", onPinMove);
   window.addEventListener("pointerup", onPinUp);
@@ -3271,15 +3282,25 @@ function onPinMove(e) {
     if (Math.abs(e.clientX - pinDrag.x0) < PIN_DRAG_THRESHOLD &&
         Math.abs(e.clientY - pinDrag.y0) < PIN_DRAG_THRESHOLD) return;
     pinDrag.moved = true;
+    /* ★ここで範囲選択を止める。pointerdown では preventDefault できない
+       （Leaflet のクリック→ポップアップが死ぬ）ので、そのぶんブラウザの既定の
+       ドラッグ選択が始まっている。すでに選ばれたぶんを消し、以後を止める。
+       最初から user-select:none にはしない——予定の本文をコピーできなくなる。 */
+    const sel = window.getSelection && window.getSelection();
+    if (sel && sel.removeAllRanges) sel.removeAllRanges();
+    document.body.classList.add("pin-dragging");
     pinDrag.ghost = document.createElement("div");
     pinDrag.ghost.className = "pin-ghost";
-    pinDrag.ghost.textContent = pinDrag.name;
     document.body.appendChild(pinDrag.ghost);
   }
   e.preventDefault();
   pinDrag.ghost.style.left = e.clientX + "px";
   pinDrag.ghost.style.top = e.clientY + "px";
-  markDropTarget(dropTargetAt(e.clientX, e.clientY));
+  const target = dropTargetAt(e.clientX, e.clientY);
+  // 落とすと何が起きるかを、掴んだまま分かるようにする
+  pinDrag.ghost.textContent = (target && target.onto) ? `📍 この行に紐づけ：${pinDrag.name}` : pinDrag.name;
+  pinDrag.ghost.classList.toggle("is-onto", !!(target && target.onto));
+  markDropTarget(target);
   const list = $("#sched-list");
   const r = list && list.getBoundingClientRect();
   pinScrollDir = !r ? 0 : (e.clientY < r.top + 48 ? -1 : e.clientY > r.bottom - 48 ? 1 : 0);
@@ -3287,12 +3308,17 @@ function onPinMove(e) {
 }
 function onPinUp(e) {
   if (!pinDrag) return;
-  const moved = pinDrag.moved, name = pinDrag.name;
+  const moved = pinDrag.moved, name = pinDrag.name, id = pinDrag.id;
   const target = moved ? dropTargetAt(e.clientX, e.clientY) : null;
   endPinDrag();                 // ★先に畳む。このあと何が起きても地図は生き返る
   if (!moved || !target) return;   // タップ、または一覧の外＝ポップアップに任せる
   /* ★落とし先は「いま」の DOM から解決する。ドラッグ中に同行者の編集が届いて
      一覧が描き直されていることがあるので、hover 中に覚えた行は当てにしない。 */
+  if (target.onto && target.onto.isConnected) {
+    // 行の真ん中に落とした＝その予定に地点を紐づける（新しい行は増やさない）
+    setSchedRef(+target.onto.dataset.i, id);
+    return;
+  }
   const before = target.before && target.before.isConnected ? target.before : null;
   const slot = schedDropSlot(before);
   insertSchedItem(schedItemFromName(name, slot.day), slot.at);
@@ -3301,6 +3327,7 @@ function endPinDrag() {
   if (!pinDrag) return;
   const moved = pinDrag.moved;
   if (pinDrag.ghost) pinDrag.ghost.remove();
+  document.body.classList.remove("pin-dragging");   // ★出口はここ1本。必ず選択を戻す
   markDropTarget(null);
   if (pinScrollRaf) cancelAnimationFrame(pinScrollRaf);
   pinScrollRaf = 0; pinScrollDir = 0;
@@ -3325,7 +3352,20 @@ function pinAutoScroll() {
   else window.scrollBy(0, pinScrollDir * 14);
   pinScrollRaf = requestAnimationFrame(pinAutoScroll);
 }
-/* ポインタの真下が一覧のどの行の手前かを返す。一覧の外なら null。
+/* 行の矩形のどこに落ちたか。
+   ★上下の端は「行と行の間に入れる」、真ん中は「その行に地点を紐づける」。
+     端の幅は行の高さの3割（最大14px）。行が低いときでも真ん中が潰れないようにする。
+   ★矩形を渡すだけの純関数にしてある。位置の測定は dropTargetAt() の仕事で、
+     こちらは jsdom でもそのまま検査できる（0-6 の線引き）。 */
+function dropZoneIn(rect, y) {
+  const edge = Math.min(14, rect.height * 0.3);
+  if (y < rect.top + edge) return "before";
+  if (y > rect.bottom - edge) return "after";
+  return "onto";
+}
+/* ポインタの真下がどこかを返す。一覧の外なら null。
+   ・{ before: li }   … その行の手前に新しい予定を入れる（li が null なら末尾）
+   ・{ onto: li }     … その予定に地点を紐づける（行は増えない）
    ★行の矩形で判定する。行と行のすき間に落としても受け付けたいので
      elementFromPoint（＝真下の1要素）は使わない。 */
 function dropTargetAt(x, y) {
@@ -3335,18 +3375,27 @@ function dropTargetAt(x, y) {
   const rows = $$("#sched-list > li");
   for (let i = 0; i < rows.length; i++) {
     const rr = rows[i].getBoundingClientRect();
-    if (y < rr.top + rr.height / 2) return { before: rows[i] };
+    if (y > rr.bottom) continue;                       // まだ下の行
+    const zone = dropZoneIn(rr, y);
+    // 日付見出しには紐づけられない（data-i を持たない）ので、常に「間に入れる」
+    const linkable = rows[i].classList.contains("sched-item");
+    if (zone === "onto" && linkable) return { onto: rows[i] };
+    if (zone === "after") return { before: rows[i + 1] || null };
+    return { before: rows[i] };
   }
   return { before: null };   // 末尾へ
 }
 /* 落ちる場所の目印。★行を挿し込まずクラスだけで出す（挿し込むと
-   schedDropSlot() が数える子要素が変わってしまう）。 */
+   schedDropSlot() が数える子要素が変わってしまう）。
+   線＝間に入る／枠＝その行に紐づく、で見分けられるようにする。 */
 function markDropTarget(target) {
   const list = $("#sched-list"); if (!list) return;
-  $$("#sched-list > li.drop-before").forEach(el => el.classList.remove("drop-before"));
+  $$("#sched-list > li.drop-before, #sched-list > li.drop-onto")
+    .forEach(el => el.classList.remove("drop-before", "drop-onto"));
   list.classList.remove("drop-end");
   if (!target) return;
-  if (target.before) target.before.classList.add("drop-before");
+  if (target.onto) target.onto.classList.add("drop-onto");
+  else if (target.before) target.before.classList.add("drop-before");
   else list.classList.add("drop-end");
 }
 
